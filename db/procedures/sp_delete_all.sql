@@ -31,6 +31,7 @@ this_proc: BEGIN
   DELETE FROM `messages`;
   DELETE FROM `paths`;
   DELETE FROM `types`;
+  DELETE FROM `scopes`;
 
   SET SQL_SAFE_UPDATES = v_sql_safe_updates;
 

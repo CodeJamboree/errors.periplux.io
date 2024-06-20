@@ -21,6 +21,7 @@ this_proc: BEGIN
 
   SELECT
     l.`id`,
+    s.`scope`,
     ld.`last_at`,
     t.`type`,
     m.`message`,
@@ -29,6 +30,7 @@ this_proc: BEGIN
     ld.`count`
   FROM
     `logs` AS l
+    INNER JOIN `scopes` AS s ON l.`scope_id` = s.`id`
     INNER JOIN `types` AS t ON l.`type_id` = t.`id`
     INNER JOIN `messages` AS m ON l.`message_id` = m.`id`
     INNER JOIN `paths` AS p ON l.`path_id` = p.`id`

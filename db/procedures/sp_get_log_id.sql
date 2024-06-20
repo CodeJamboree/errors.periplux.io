@@ -3,6 +3,7 @@ DROP PROCEDURE IF EXISTS sp_get_log_id;
 DELIMITER //
 
 CREATE PROCEDURE sp_get_log_id (
+  IN p_scope_id INT,
   IN p_created_at BIGINT,
   IN p_type_id INT,
   IN p_message_id INT,
@@ -18,7 +19,13 @@ this_proc: BEGIN
 
   SET p_log_id = NULL;
 
-  IF p_type_id IS NULL OR p_message_id IS NULL OR p_path_id IS NULL OR p_line IS NULL OR p_created_at IS NULL THEN
+  IF p_scope_id IS NULL
+    OR p_type_id IS NULL
+    OR p_message_id IS NULL
+    OR p_path_id IS NULL
+    OR p_line IS NULL
+    OR p_created_at IS NULL
+  THEN
     LEAVE this_proc;
   END IF;
 
@@ -34,7 +41,8 @@ this_proc: BEGIN
   FROM
     `logs`
   WHERE
-    `type_id` = p_type_id
+    `scope_id` = p_scope_id
+    AND `type_id` = p_type_id
     AND `message_id` = p_message_id
     AND `path_id` = p_path_id
     AND `line` = p_line
@@ -54,6 +62,7 @@ this_proc: BEGIN
   END IF;
 
   INSERT INTO `logs` (
+    `scope_id`,
     `first_at`,
     `last_at`,
     `type_id`,
@@ -61,6 +70,7 @@ this_proc: BEGIN
     `path_id`,
     `line`
   ) VALUES (
+    p_scope_id,
     p_created_at,
     p_created_at,
     p_type_id,
