@@ -33,80 +33,37 @@ const procedurePath = './db/procedures';
 let relationships = {};
 const tableOrder = [];
 const parameters = {};
-const parameterSuffixes = {
-  affected_rows: 'INT',
-  algorithm: 'VARCHAR(64)',
-  changed: 'BOOLEAN',
-  details: 'TEXT',
-  encrypted: 'BLOB',
-  everywhere: 'BOOLEAN',
-  external_id: 'INT',
-  hash: 'BINARY(32)',
-  iv: 'VARBINARY(32)',
-  line: 'INT',
-  page_number: 'INT',
-  page_size: 'INT',
-  salt: 'BINARY(32)',
-  session_id: 'VARCHAR(64)',
-  stack_trace: 'TEXT',
-  at: 'BIGINT',
-  id: 'INT'
-};
 
-const knownParameters = [
-  'p_account_id',
-  'p_affected_rows',
-  'p_created_at',
-  'p_details',
-  'p_email_encrypted',
-  'p_email_iv',
-  'p_email_pepper_hash',
-  'p_encryption_algorithm',
-  'p_encryption_key_external_id',
-  'p_encryption_key',
-  'p_everywhere',
-  'p_hash_algorithm',
-  'p_hash_pepper_external_id',
-  'p_line',
-  'p_log_id',
-  'p_message',
-  'p_page_number',
-  'p_page_size',
-  'p_password_changed',
-  'p_password_salt',
-  'p_password_salt_pepper_hash',
-  'p_path',
-  'p_path_id',
-  'p_scope',
-  'p_session_id',
-  'p_stack_trace',
-  'p_type',
-  'p_unix_timestamp',
-  'p_message_id',
-  'p_name',
-  'p_name_encrypted',
-  'p_name_iv',
-  'p_type_id',
-  'p_user_id',
-  'p_username_encrypted',
-  'p_username_iv',
-  'p_username_pepper_hash',
-  'p_value'
-];
-const procMessages = [
-  'Failed',
-  'Not found',
-  'Nothing changed',
-  'SQL Exception',
-  'Success'
-];
-//  fs.readFileSync(path.join(dataPath, 'procedure_messages.sql'), 'utf-8')
-//   .split('\n')
-//   .map(line => {
-//     let match = /^\('([-a-z\d ]+)'/i.exec(line);
-//     if (match === null) return;
-//     return match[1];
-//   }).filter(Boolean);
+let parameterSuffixes = {};
+let dataTypesPath = './scripts/data/data_types.json';
+if (fs.existsSync(dataTypesPath)) {
+  let temp = JSON.parse(fs.readFileSync(dataTypesPath, 'utf-8'));
+  let keys = Object.keys(temp);
+  keys.sort();
+  const sortedTemp = {};
+  keys.forEach(key => {
+    sortedTemp[key] = temp[key];
+  });
+
+  fs.writeFileSync(dataTypesPath, JSON.stringify(sortedTemp, null, 2), 'utf-8');
+  parameterSuffixes = dataTypesPath;
+}
+
+let knownParameters = [];
+const knownParametersPath = './scripts/data/parameters.txt';
+if (fs.existsSync(knownParametersPath)) {
+  knownParameters = fs.readFileSync(knownParametersPath, 'utf-8').split('\n').filter(Boolean);
+  knownParameters.sort();
+  fs.writeFileSync(knownParametersPath, knownParameters.join('\n') + '\n', 'utf-8');
+}
+
+let procMessages = [];
+const messagesPath = './scripts/data/messages.txt';
+if (fs.existsSync(messagesPath)) {
+  procMessages = fs.readFileSync(messagesPath, 'utf-8').split('\n').filter(Boolean);
+  procMessages.sort();
+  fs.writeFileSync(messagesPath, procMessages.join('\n') + '\n', 'utf-8');
+}
 
 fs.readdir(directoryPath, (err, files) => {
   if (err) {
