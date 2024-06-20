@@ -24,10 +24,9 @@ this_proc: BEGIN
 
   DELETE FROM `log_dates`;
   DELETE FROM `log_details`;
-  DELETE FROM `log_stack_traces`;
   DELETE FROM `logs`;
   DELETE FROM `details`;
-  DELETE FROM `stack_traces`;
+  DELETE FROM `detail_types`;
   DELETE FROM `messages`;
   DELETE FROM `paths`;
   DELETE FROM `types`;

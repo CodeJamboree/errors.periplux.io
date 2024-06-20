@@ -24,7 +24,6 @@ this_proc: BEGIN
 
   DELETE FROM `log_dates` WHERE `log_id` = p_log_id;
   DELETE FROM `log_details` WHERE `log_id` = p_log_id;
-  DELETE FROM `log_stack_traces` WHERE `log_id` = p_log_id;
   DELETE FROM `logs` WHERE `id` = p_log_id;
 
   -- About to remove notifications without directly using id
@@ -34,11 +33,8 @@ this_proc: BEGIN
   DELETE FROM `details` WHERE `id` NOT IN(
     SELECT `detail_id` FROM `log_details`
   );
-  DELETE FROM `stack_traces` WHERE `id` NOT IN(
-    SELECT `stack_trace_id` FROM `log_stack_traces`
-  );
-  DELETE FROM `scopes` WHERE `id` NOT IN(
-    SELECT `scope_id` FROM `logs`
+  DELETE FROM `detail_types` WHERE `id` NOT IN(
+    SELECT `detail_type_id` FROM `details`
   );
   DELETE FROM `messages` WHERE `id` NOT IN(
     SELECT `message_id` FROM `logs`

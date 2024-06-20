@@ -21,10 +21,12 @@ this_proc: BEGIN
   SET v_page_offset = p_page_size * (p_page_number - 1);
 
   SELECT
+    dt.`detail_type`,
     d.`details`
   FROM
     `log_details` AS ld
     INNER JOIN `details` AS d ON ld.`detail_id` = d.`id`
+    INNER JOIN `detail_types` AS dt ON d.`detail_type_id` = dt.`id`
   WHERE
     ld.`log_id` = p_log_id
   ORDER BY

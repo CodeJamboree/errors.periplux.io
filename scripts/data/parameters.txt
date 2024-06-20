@@ -1,5 +1,7 @@
 p_affected_rows
 p_created_at
+p_detail_type
+p_detail_type_id
 p_details
 p_line
 p_log_id
