@@ -1,19 +1,11 @@
 {
   "affected_rows": "INT",
-  "algorithm": "VARCHAR(64)",
   "at": "BIGINT",
-  "changed": "BOOLEAN",
   "details": "TEXT",
-  "encrypted": "BLOB",
-  "everywhere": "BOOLEAN",
-  "external_id": "INT",
   "hash": "BINARY(32)",
   "id": "INT",
-  "iv": "VARBINARY(32)",
   "line": "INT",
   "page_number": "INT",
   "page_size": "INT",
-  "salt": "BINARY(32)",
-  "session_id": "VARCHAR(64)",
   "stack_trace": "TEXT"
 }
