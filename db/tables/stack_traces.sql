@@ -1,0 +1,5 @@
+CREATE TABLE `stack_traces` (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+  `hash` CHAR(64) NOT NULL UNIQUE,
+	`stack_trace` TEXT NOT NULL
+)

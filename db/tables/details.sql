@@ -1,0 +1,5 @@
+CREATE TABLE `details` (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+  `hash` CHAR(64) NOT NULL UNIQUE,
+	`details` TEXT NOT NULL
+)
