@@ -22,12 +22,12 @@ this_proc: BEGIN
   SELECT
     l.`id`,
     s.`scope`,
-    ld.`last_at`,
+    MAX(ld.`last_at`) AS `last_at`,
     t.`type`,
     m.`message`,
     p.`path`,
     l.`line`,
-    ld.`count`
+    SUM(ld.`count`) AS `count`
   FROM
     `logs` AS l
     INNER JOIN `scopes` AS s ON l.`scope_id` = s.`id`
@@ -35,6 +35,13 @@ this_proc: BEGIN
     INNER JOIN `messages` AS m ON l.`message_id` = m.`id`
     INNER JOIN `paths` AS p ON l.`path_id` = p.`id`
     INNER JOIN `log_dates` AS ld ON ld.`log_id` = l.`id`
+  GROUP BY
+    l.`id`,
+    s.`scope`,
+    t.`type`,
+    m.`message`,
+    p.`path`,
+    l.`line`
   ORDER BY
     ld.`last_at` DESC
   LIMIT p_page_size OFFSET v_page_offset;
