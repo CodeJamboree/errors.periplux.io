@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { NgFor, CommonModule } from '@angular/common';
 import { LogsService } from './logs.service';
 
 interface LogData {
@@ -17,7 +17,7 @@ interface LogData {
   selector: 'app-logs',
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.scss'],
-  imports: [NgFor],
+  imports: [NgFor, CommonModule],
   standalone: true
 })
 export class LogsComponent implements OnInit {
