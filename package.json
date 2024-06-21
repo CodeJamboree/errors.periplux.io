@@ -1,0 +1,30 @@
+{
+  "name": "@codejamboree/errors.periplux.io",
+  "version": "1.0.0",
+  "description": "Store and view errors logged within a MySQL database.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodeJamboree/errors.periplux.io.git"
+  },
+  "keywords": [
+    "errors",
+    "log",
+    "logging",
+    "error",
+    "log",
+    "system",
+    "log",
+    "php",
+    "errors"
+  ],
+  "author": "Code Jamboree LLC",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/CodeJamboree/errors.periplux.io/issues"
+  },
+  "homepage": "https://github.com/CodeJamboree/errors.periplux.io#readme"
+}
