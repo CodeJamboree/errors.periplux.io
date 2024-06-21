@@ -1,0 +1,31 @@
+Hi.
+<table>
+  <thead>
+    <tr>
+      <td>id</td>
+      <td>scope</td>
+      <td>last at</td>
+      <td>type</td>
+      <td>message</td>
+      <td>path</td>
+      <td>line</td>
+      <td>count</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of data">
+      <td>{{item.id}}</td>
+      <td>{{item.scope}}</td>
+      <td>{{item.last_at}}</td>
+      <td>{{item.type}}</td>
+      <td>{{item.message}}</td>
+      <td>{{item.path}}</td>
+      <td>{{item.line}}</td>
+      <td>{{item.count}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<button (click)="previousPage()">Previous</button>
+<span>Page {{currentPage}} of {{ totalPages }}</span>
+<button (click)="nextPage()">Next</button>
