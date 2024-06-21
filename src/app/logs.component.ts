@@ -28,7 +28,6 @@ export class LogsComponent implements OnInit {
   totalPages: number = 0;
 
   constructor(private logsService: LogsService) {
-    this.loadData(1);
   }
 
   ngOnInit() {
