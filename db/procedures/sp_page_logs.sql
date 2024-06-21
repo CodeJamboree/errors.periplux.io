@@ -19,7 +19,7 @@ this_proc: BEGIN
   END IF;
   SET v_page_offset = p_page_size * (p_page_number - 1);
 
-  SELECT
+  SELECT SQL_CALC_FOUND_ROWS
     l.`id`,
     s.`scope`,
     MAX(ld.`last_at`) AS `last_at`,
