@@ -10,6 +10,7 @@ import { LogsComponent } from './logs.component';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  @ViewChild('logsContainer', { read: ViewContainerRef })
+  // @ViewChild('logsContainer', { read: ViewContainerRef })
   title = 'Error Log';
 }
+
