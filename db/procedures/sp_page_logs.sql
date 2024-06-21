@@ -43,7 +43,7 @@ this_proc: BEGIN
     p.`path`,
     l.`line`
   ORDER BY
-    ld.`last_at` DESC
+    MAX(ld.`last_at`) DESC
   LIMIT p_page_size OFFSET v_page_offset;
   
   SET p_affected_rows = FOUND_ROWS();
