@@ -21,7 +21,7 @@ interface LogResult {
   providedIn: 'root'
 })
 export class LogsService {
-  baseUrl = '/api/logs';
+  baseUrl = 'https://dev-api.periplux.io/errors/logs';
 
   constructor(private http: HttpClient) { }
 
