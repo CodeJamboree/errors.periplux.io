@@ -1,12 +1,14 @@
 <table>
   <thead>
     <tr>
-      <td>id</td>
+      <td>Log</td>
       <td>scope</td>
       <td>date</td>
       <td>time</td>
       <td>type</td>
+      <td></td>
       <td>message</td>
+      <td></td>
       <td>path</td>
       <td>line</td>
       <td>count</td>
@@ -15,12 +17,19 @@
   <tbody>
     <tr *ngFor="let item of data">
       <td>{{item.id}}</td>
-      <td>{{item.scope}}</td>
-      <td>{{item.last_at * 1000 | date: 'shortDate'}}</td>
-      <td>{{item.last_at * 1000 | date: 'shortTime'}}</td>
-      <td>{{item.type}}</td>
-      <td>{{item.message}}</td>
-      <td>{{item.path}}</td>
+      <td title="{{item.scope}}"><img src="{{ generateMatrixImage(item.scope, 4, 4)}}"></td>
+      <td title="{{item.last_at * 1000 | date: 'fullDate'}}" attr.data-weekday="{{item.last_at * 1000 | date: 'c' }}">
+        {{item.last_at * 1000 | date: 'shortDate'}}</td>
+      <td title="{{item.last_at * 1000 | date: 'fullTime'}}">{{item.last_at * 1000 | date: 'shortTime'}}</td>
+      <td title="{{item.type}}">{{errorTypeAsEmoji(item.type)}}</td>
+      <td><img src="{{ generateMatrixImage(item.message, 4, 4)}}"></td>
+      <td title=" {{item.message}}">
+        <div class="message">{{item.message}}</div>
+      </td>
+      <td><img src="{{ generateMatrixImage(item.path, 4, 4)}}"></td>
+      <td title="{{item.path}}">
+        <div class="path" attr.data-file="{{parseFile(item.path)}}">&lrm;{{item.path}}</div>
+      </td>
       <td>{{item.line}}</td>
       <td>{{item.count}}</td>
     </tr>

@@ -1,0 +1,78 @@
+.message {
+  width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.path {
+  width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  position: relative;
+  text-align: right;
+  color: grey;
+}
+
+.path::after {
+  content: attr(data-file);
+  color: black;
+  position: absolute;
+  right: 0;
+}
+
+*[data-weekday="1"] {
+  border-left: 5px solid red;
+}
+
+*[data-weekday="2"] {
+  border-left: 5px solid orange;
+}
+
+*[data-weekday="3"] {
+  border-left: 5px solid yellow;
+}
+
+*[data-weekday="4"] {
+  border-left: 5px solid green;
+}
+
+*[data-weekday="5"] {
+  border-left: 5px solid blue;
+}
+
+*[data-weekday="6"] {
+  border-left: 5px solid indigo;
+}
+
+*[data-weekday="7"] {
+  border-left: 5px solid violet;
+}
+
+table {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: smaller;
+  border: 1px solid gray;
+  border-collapse: collapse;
+}
+
+table td {
+  border-bottom: 1px solid gray;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+thead td {
+  text-transform: capitalize;
+  font-weight: bold;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: rgb(245, 245, 245);
+}
+
+tbody tr:nth-child(even) {
+  background-color: rgb(222, 222, 222);
+}
