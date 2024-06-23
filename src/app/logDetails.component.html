@@ -1,0 +1,11 @@
+<div class="list-container">
+  <div class="flex-list" *ngFor="let item of data">
+    <div class="title">{{item.detail_type}}</div>
+    <div class="content">{{item.details}}</div>
+  </div>
+</div>
+<div *ngIf="totalPages > 1">
+  <button (click)="previousPage()">Previous</button>
+  <span>Page {{currentPage}} of {{ totalPages }}</span>
+  <button (click)="nextPage()">Next</button>
+</div>

@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LogData } from './LogData';
 import { LogDatesComponent } from './logDates.component';
+import { LogDetailsComponent } from './logDetails.component';
 
 
 import { FlexLayoutModule } from "@angular/flex-layout";
@@ -20,7 +21,18 @@ import { AgePipe } from './AgePipe';
   selector: 'app-log',
   templateUrl: './log.component.html',
   styleUrls: ['./log.component.scss'],
-  imports: [LogDatesComponent, AgePipe, DurationPipe, CommonModule, FlexLayoutModule, MatDialogModule, MatButtonModule, MatInputModule, MatTableModule],
+  imports: [
+    LogDetailsComponent,
+    LogDatesComponent,
+    AgePipe,
+    DurationPipe,
+    CommonModule,
+    FlexLayoutModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatInputModule,
+    MatTableModule
+  ],
   standalone: true
 })
 export class LogComponent {
