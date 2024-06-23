@@ -13,7 +13,7 @@ interface PaginatedResponse<T> {
   providedIn: 'root'
 })
 export class LogDetailsService {
-  baseUrl = 'https://dev-api.periplux.io/errors/details';
+  baseUrl = `${environment.api}/details`;
 
   constructor(private http: HttpClient) { }
 

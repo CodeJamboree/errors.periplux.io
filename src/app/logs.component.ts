@@ -1,14 +1,17 @@
-/* eslint-disable no-console */
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgFor, CommonModule } from '@angular/common';
+import { MatDialogModule, MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatButtonModule } from "@angular/material/button";
+import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+
 import { LogsService } from './logs.service';
 import { LogComponent } from './log.component';
-import { MatDialogModule, MatDialog, MatDialogRef, MatDialogConfig, DialogPosition } from '@angular/material/dialog';
 import { LogData } from './LogData';
 import { generateMatrixImage } from './generateMatrixImage';
 import { errorTypeAsEmoji } from './errorTypeAsEmoji';
-import { MatButtonModule } from "@angular/material/button";
-import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
+
+const defaultPageSize = 25;
 
 @Component({
   selector: 'app-logs',
@@ -28,28 +31,57 @@ export class LogsComponent implements OnInit {
   @ViewChild('paginator') paginator!: MatPaginator
   pageSizeOptions = [5, 10, 25, 50, 100];
   totalItems: number = 0;
-  pageSize: number = 25;
-  pageIndex: number = 0;
+  pageSize: number = defaultPageSize;
+  pageIndex: number = -1;
   data: LogData[] = [];
   isDialogOpen: boolean = false;
   errorTypeAsEmoji = errorTypeAsEmoji;
   generateMatrixImage = generateMatrixImage;
 
-  constructor(private logsService: LogsService, public dialog: MatDialog) {
+  constructor(
+    private logsService: LogsService,
+    public dialog: MatDialog,
+    private activatedRoute: ActivatedRoute,
+    private router: Router
+  ) {
   }
 
   ngOnInit() {
-    this.loadData(this.pageIndex, this.pageSize);
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        const page = this.activatedRoute.snapshot.queryParamMap.get('page');
+        const size = this.activatedRoute.snapshot.queryParamMap.get('size');
+        let pageIndex = page ? parseInt(page, 10) - 1 : 0;
+        if (pageIndex < 0) pageIndex = 0;
+        let pageSize = size ? parseInt(size, 10) : defaultPageSize;
+        if (!this.pageSizeOptions.includes(pageSize)) {
+          pageSize = defaultPageSize;
+        }
+        this.loadData(pageIndex, pageSize);
+      }
+    });
   }
 
   loadData(pageIndex: number, pageSize: number) {
+    if (pageIndex === this.pageIndex && pageSize === this.pageSize) {
+      return;
+    }
     this.logsService.getPage(pageIndex + 1, pageSize)
       .subscribe(response => {
         this.pageSize = pageSize;
         this.pageIndex = pageIndex;
         this.data = response.data;
         this.totalItems = response.total;
+        this.router.navigate([''], {
+          queryParams: {
+            page: pageIndex + 1,
+            size: pageSize
+          }
+        })
       });
+  }
+  handlePageEvent(event: PageEvent) {
+    this.loadData(event.pageIndex, event.pageSize);
   }
   onRowClick(item: LogData) {
     if (this.isDialogOpen) return;
@@ -68,9 +100,6 @@ export class LogsComponent implements OnInit {
     const i = path.lastIndexOf('/');
     if (i === -1) return '';
     return path.substring(i + 1);
-  }
-  handlePageEvent(event: PageEvent) {
-    this.loadData(event.pageIndex, event.pageSize);
   }
 }
 
