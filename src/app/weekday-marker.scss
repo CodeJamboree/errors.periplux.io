@@ -1,0 +1,32 @@
+*[data-weekday] {
+  border-left-width: 7px;
+  border-left-style: solid;
+}
+
+*[data-weekday="0"] {
+  border-left-color: hsl(0, 100%, 50%);
+}
+
+*[data-weekday="1"] {
+  border-left-color: hsl(60, 100%, 65%);
+}
+
+*[data-weekday="2"] {
+  border-left-color: hsl(90, 100%, 75%);
+}
+
+*[data-weekday="3"] {
+  border-left-color: hsl(134, 100%, 38%);
+}
+
+*[data-weekday="4"] {
+  border-left-color: hsl(205, 100%, 84%);
+}
+
+*[data-weekday="5"] {
+  border-left-color: hsl(244, 100%, 50%);
+}
+
+*[data-weekday="6"] {
+  border-left-color: hsl(308, 100%, 88%);
+}

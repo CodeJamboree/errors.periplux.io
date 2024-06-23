@@ -1,0 +1,27 @@
+.striped {
+  border-collapse: collapse;
+  border: 1px solid gray;
+
+  thead td {
+    text-transform: capitalize;
+    font-weight: bold;
+    border-bottom: 1px dashed gray;
+  }
+
+  tbody tr {
+    &:nth-child(odd) td {
+      background-color: rgba(0, 0, 0, 4%);
+    }
+
+    &:nth-child(even) td {
+      background-color: rgba(0, 0, 0, 13%);
+    }
+
+    td {
+      border-bottom: 1px solid gray;
+      padding-left: 5px;
+      padding-right: 5px;
+      vertical-align: top;
+    }
+  }
+}
