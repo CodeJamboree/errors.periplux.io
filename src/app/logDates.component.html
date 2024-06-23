@@ -1,0 +1,23 @@
+<img src="{{graphDates()}}">
+<table class="striped">
+  <thead>
+    <tr>
+      <td>From</td>
+      <td>To</td>
+      <td>Occurances</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of data">
+      <td attr.data-weekday="{{item.first_at * 1000 | date: 'c' }}" title="{{item.first_at * 1000 | date: 'full'}}">
+        {{item.first_at * 1000 | date: 'short'}}</td>
+      <td attr.data-weekday="{{item.last_at * 1000 | date: 'c' }}" title="{{item.last_at * 1000 | date: 'full'}}">
+        {{item.last_at * 1000 | date: 'short'}}</td>
+      <td>{{item.count | number}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<button (click)="previousPage()">Previous</button>
+<span>Page {{currentPage}} of {{ totalPages }}</span>
+<button (click)="nextPage()">Next</button>
