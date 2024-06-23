@@ -16,7 +16,7 @@
   </thead>
   <tbody attr.data-can-select="{{!isDialogOpen}}">
     <tr *ngFor="let item of data" (click)="onRowClick(item)">
-      <td>{{item.id}}</td>
+      <td class="number">{{item.id}}</td>
       <td title="{{item.scope}}"><img src="{{ generateMatrixImage(item.scope_hash)}}"></td>
       <td title="{{item.last_at * 1000 | date: 'fullDate'}}" attr.data-weekday="{{item.last_at * 1000 | date: 'c' }}">
         {{item.last_at * 1000 | date: 'shortDate'}}</td>
@@ -30,12 +30,11 @@
       <td title="{{item.path}}">
         <div class="path" attr.data-file="{{parseFile(item.path)}}">&lrm;{{item.path}}</div>
       </td>
-      <td>{{item.line | number}}</td>
-      <td>{{item.count | number}}</td>
+      <td class="number">{{item.line | number}}</td>
+      <td class="number">{{item.count | number}}</td>
     </tr>
   </tbody>
 </table>
 
-<button (click)="previousPage()">Previous</button>
-<span>Page {{currentPage}} of {{ totalPages }}</span>
-<button (click)="nextPage()">Next</button>
+<mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" [length]="totalItems"
+  [pageIndex]="pageIndex" (page)="handlePageEvent($event)"></mat-paginator>
