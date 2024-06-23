@@ -1,6 +1,6 @@
 <?php
-require_once 'HTTP_STATUS.php';
-require_once 'Secrets.php';
+require_once __DIR__ . 'HTTP_STATUS.php';
+require_once __DIR__ . 'Secrets.php';
 
 // mysqli_report(MYSQLI_REPORT_OFF);
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -121,10 +121,13 @@ class Database
         }
         return false;
     }
-    public function get_last_exception($message)
+    public function get_last_exception($message = "")
     {
         if (empty($this->errorMessage)) {
-            return null;
+            if (empty($message)) {
+                return null;
+            }
+            return new Exception($message);
         }
 
         $errorMessage = $this->errorMessage;
@@ -169,8 +172,12 @@ class Database
         }
         return false;
     }
-    public function bind_param($types,  &  ...$values)
+    public function bind_param($types = '',  &  ...$values)
     {
+        if ($types === '') {
+            return true;
+        }
+
         $result = $this->stmt->bind_param($types, ...$values);
         if ($result === false) {
             return $this->handleError(

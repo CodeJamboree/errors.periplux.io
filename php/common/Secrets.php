@@ -1,4 +1,5 @@
 <?php
+require_once "ErrorHandling.php";
 require_once "Show.php";
 require_once "DatabaseHelper.php";
 
@@ -30,6 +31,7 @@ final class Secrets
     private static $timestamp;
     private static $use_cache = true;
     private static $cache = null;
+    private static $is_cache_available = null;
     private static $db = null;
     private static $pepperCache = null;
     private static $errors = [];
@@ -135,7 +137,7 @@ final class Secrets
     {
         return getenv("ENVIRONMENT") === "PRODUCTION";
     }
-    private static function scope()
+    public static function scope()
     {
         return $_SERVER['SERVER_NAME'];
     }
@@ -145,48 +147,61 @@ final class Secrets
     }
     private static function cache_available()
     {
-
+        if (self::$is_cache_available !== null) {
+            return self::$is_cache_available;
+        }
         if (!self::cache_enabled()) {
             self::add_error("Cache disabled");
+            self::$is_cache_available = false;
             return false;
         }
 
         if (!extension_loaded('memcache')) {
             self::add_error("Memcache extension not loaded");
+            self::$is_cache_available = false;
             return false;
         }
 
         if (self::pepper() === false) {
             self::add_error("Pepper unavailable for cache");
+            self::$is_cache_available = false;
             return false;
         }
 
         $host = getenv(self::cache_host_key());
         if (empty($host)) {
             self::add_error("Cache host not configured");
+            self::$is_cache_available = false;
             return false;
         }
         $port = getenv(self::cache_port_key());
         if (empty($port)) {
             self::add_error("Cache port not configured");
+            self::$is_cache_available = false;
             return false;
         }
         if (!settype($port, 'integer')) {
             self::add_error("Cache port not an integer");
+            self::$is_cache_available = false;
             return false;
         }
 
         if ($port < 0) {
             self::add_error("Cache port is negative");
+            self::$is_cache_available = false;
             return false;
         }
 
         self::$cache = new Memcache;
+        // $result = self::$cache->addServer($host, $port);
         $result = self::$cache->connect($host, $port);
+
         if ($result === false) {
-            self::add_error("Failed to connect to cache server");
+            self::add_error("Failed to add cache server");
+            self::$is_cache_available = false;
             throw new Exception("Memcache failed");
         }
+        self::$is_cache_available = true;
         return true;
     }
     public static function valid_name(string $name)
@@ -316,7 +331,7 @@ final class Secrets
     {
         return self::db() !== false;
     }
-    private static function get_db(string $name)
+    private static function get_db(string $scope, string $name)
     {
         if (!self::valid_name($name)) {
             return false;
@@ -329,11 +344,11 @@ final class Secrets
         $rows = $db->selectRows(
             "CALL sp_secret_get(?, ?)",
             "ss",
-            self::scope(),
+            $scope,
             $name
         );
         if ($rows === false || count($rows) === 0) {
-            $e = $db->get_last_exception;
+            $e = $db->get_last_exception();
             if (!empty($e)) {
                 self::add_error($e->getMessage());
             }
@@ -484,11 +499,12 @@ final class Secrets
 
         $total = count($names);
         $success = 0;
+        $scope = self::scope();
 
         foreach ($names as $name) {
-            $value = self::get_db($name);
+            $value = self::get_db($scope, $name);
             if ($value !== false) {
-                $result = self::set_db($name, $value);
+                $result = self::set_db($scope, $name, $value);
                 if ($result !== false) {
                     $success++;
                 }
@@ -535,7 +551,7 @@ final class Secrets
         }
 
     }
-    private static function set_db($name, #[SensitiveParameter] $value)
+    private static function set_db($scope, $name, #[SensitiveParameter] $value)
     {
         if (!self::valid_name($name)) {
             return false;
@@ -561,7 +577,7 @@ final class Secrets
         $result = $db->selectScalar(
             "CALL sp_secret_set(?, ?, ?, ?)",
             "ssss",
-            self::scope(),
+            $scope,
             $name,
             $encryption_key,
             $encrypted
@@ -596,27 +612,32 @@ final class Secrets
             return false;
         }
     }
-    public static function reveal(string $name)
+    public static function reveal(string $name, ?string $scope = null)
     {
         if (!self::valid_name($name)) {
             return false;
         }
-        if (array_key_exists($name, self::$decryptedCache)) {
-            return self::$decryptedCache[$name];
+        if ($scope === null) {
+            $scope = self::scope();
         }
-
-        $value = self::get_cache($name);
-        if ($value !== false) {
-            self::$decryptedCache[$name] = $value;
-            return $value;
+        if ($scope === self::scope()) {
+            if (array_key_exists($name, self::$decryptedCache)) {
+                return self::$decryptedCache[$name];
+            }
+            $value = self::get_cache($name);
+            if ($value !== false) {
+                self::$decryptedCache[$name] = $value;
+                return $value;
+            }
         }
-        $value = self::get_db($name);
+        $value = self::get_db($scope, $name);
         if ($value === false) {
             return false;
         }
-
-        self::$decryptedCache[$name] = $value;
-        self::set_cache($name, $value);
+        if ($scope === self::scope()) {
+            self::$decryptedCache[$name] = $value;
+            self::set_cache($name, $value);
+        }
         return $value;
     }
 
@@ -811,12 +832,12 @@ final class Secrets
         }
         return $decrypted;
     }
-    public static function encryptValue(#[SensitiveParameter] $value)
+    public static function encryptValue(#[SensitiveParameter] string $value)
     {
         $key = self::loadKey();
         return self::encrypt($value, $key);
     }
-    public static function encrypt(#[SensitiveParameter] $value, #[SensitiveParameter] $key)
+    public static function encrypt(#[SensitiveParameter] string $value, #[SensitiveParameter] $key)
     {
         self::checkKey($key);
 
@@ -882,19 +903,33 @@ final class Secrets
         return $relativePath;
     }
 
-    public static function keep(string $name, #[SensitiveParameter] ?string $value)
+    public static function keep(string $name, #[SensitiveParameter] ?string $value = '', ?string $scope = null)
     {
         if (!self::valid_name($name)) {
             return false;
         }
-        self::$decryptedCache[$name] = $value;
-        self::set_cache($name, $value);
-        $result = self::set_db($name, $value);
+        if ($value === null) {
+            $value = '';
+        }
+        if ($scope === null) {
+            $scope = self::scope();
+        }
+        $result = self::set_db($scope, $name, $value);
         if ($result === false) {
-            unset(self::$decryptedCache[$name]);
-            self::set_cache($name, null);
             self::haltExecution("Failed to store in database");
             return false;
         }
+        if ($scope !== self::scope()) {
+            return;
+        }
+
+        if ($value === '') {
+            unset(self::$decryptedCache[$name]);
+            self::set_cache($name, null);
+        } else {
+            self::$decryptedCache[$name] = $value;
+            self::set_cache($name, $value);
+        }
+
     }
 }

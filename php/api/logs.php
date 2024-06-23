@@ -1,13 +1,12 @@
 <?php
-require_once "common/Show.php";
-require_once "common/DatabaseHelper.php";
-require_once "common/Secrets.php";
+require_once "../common/Show.php";
+require_once "../common/DatabaseHelper.php";
+require_once "../common/Secrets.php";
 
 function main()
 {
-    $log_id = $_GET['log_id'] ?? 1;
     $page = $_GET['page'] ?? 1;
-    $size = $_GET['size'] ?? 10;
+    $size = $_GET['size'] ?? 5;
 
     $credentials = Secrets::revealAs("ERROR_DATABASE", 'array');
     if ($credentials === false) {
@@ -21,19 +20,18 @@ function main()
         exit;
     }
 
-    $affected_rows = -1;
     $rows = $db->selectRows(
-        'CALL sp_page_log_dates(?, ?, ?, ?)',
-        'iiii',
-        $log_id,
+        'CALL sp_page_logs(?, ?, @affected_rows)',
+        'ii',
         $page,
-        $size,
-        $affected_rows
+        $size
     );
+
+    $total = $db->selectScalar('SELECT @affected_rows');
 
     Show::data([
         "data" => $rows,
-        "total" => $affected_rows,
+        "total" => $total,
     ]);
     exit;
 }
@@ -41,5 +39,6 @@ function main()
 try {
     main();
 } catch (Exception $e) {
-    Show::error("Unhandled Exception. Message: " . $e - getMessage());
+    var_dump($e);
+    //Show::error("Unhandled Exception. Message: " . $e->getMessage());
 }

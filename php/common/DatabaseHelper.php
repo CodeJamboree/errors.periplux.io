@@ -3,7 +3,7 @@ require_once 'Database.php';
 
 class DatabaseHelper extends Database
 {
-    public function preparedExecute(& ...$values)
+    public function preparedExecute(...$values)
     {
         $typeCount = strlen($this->preparedTypes);
         $valueCount = count($values);
@@ -18,7 +18,7 @@ class DatabaseHelper extends Database
         }
         return false;
     }
-    public function selectPreparedScalar(& ...$values)
+    public function selectPreparedScalar(...$values)
     {
         if (
             $this->preparedExecute(...$values) &&
@@ -31,7 +31,7 @@ class DatabaseHelper extends Database
         }
         return false;
     }
-    public function selectScalar($sql, $types, & ...$values)
+    public function selectScalar(string $sql, ?string $types = '', ...$values)
     {
         if (
             $this->prepare($sql) &&
@@ -44,11 +44,11 @@ class DatabaseHelper extends Database
         }
         return false;
     }
-    public function selectRows($sql, $types = null,  &  ...$values)
+    public function selectRows($sql, ?string $types = '', ...$values)
     {
         if (
             $this->prepare($sql) &&
-            ($types == null || $this->bind_param($types, ...$values)) &&
+            ($types == '' || $this->bind_param($types, ...$values)) &&
             $this->execute()
         ) {
             if ($this->affected_rows === 0) {
@@ -67,20 +67,20 @@ class DatabaseHelper extends Database
         }
         return false;
     }
-    public function affectAny($sql, $types,  &  ...$values)
+    public function affectAny($sql, $types, ...$values)
     {
         return $this->prepare($sql) &&
         $this->bind_param($types, ...$values) &&
         $this->execute();
     }
-    public function affectOne($sql, $types,  &  ...$values)
+    public function affectOne($sql, $types, ...$values)
     {
         return $this->prepare($sql) &&
         $this->bind_param($types, ...$values) &&
         $this->execute() &&
         $this->affected_rows === 1;
     }
-    public function affectOneOrTwo($sql, $types,  &  ...$values)
+    public function affectOneOrTwo($sql, $types, ...$values)
     {
         return $this->prepare($sql) &&
         $this->bind_param($types, ...$values) &&

@@ -1,7 +1,7 @@
 <?php
-require_once "common/Show.php";
-require_once "common/DatabaseHelper.php";
-require_once "common/Secrets.php";
+require_once "../common/Show.php";
+require_once "../common/DatabaseHelper.php";
+require_once "../common/Secrets.php";
 
 function main()
 {
@@ -21,19 +21,19 @@ function main()
         exit;
     }
 
-    $affected_rows = -1;
     $rows = $db->selectRows(
-        'CALL sp_page_log_details(?, ?, ?, ?)',
-        'iiii',
+        'CALL sp_page_log_details(?, ?, ?, @affected_rows)',
+        'iii',
         $log_id,
         $page,
-        $size,
-        $affected_rows
+        $size
     );
+
+    $total = $db->selectScalar('SELECT @affected_rows');
 
     Show::data([
         "data" => $rows,
-        "total" => $affected_rows,
+        "total" => $total,
     ]);
     exit;
 }
