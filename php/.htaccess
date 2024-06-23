@@ -1,0 +1,34 @@
+RewriteEngine On
+
+ErrorLog error.log
+
+# Prevent accessing any file beginning wit a dot
+<FilesMatch "^\.">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Rewrite OPTIONS requests (cors) to a specific handler script or endpoint
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ options-handler.php [L]
+
+<IfModule mod_headers.c>
+  <If "%{REQUEST_METHOD} =~/^(GET|POST)$/">
+    # Browser already got past CORS OPTIONS
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+    Header set Access-Control-Allow-Credentials "true"
+  </If>
+</IfModule>
+
+# append .php extension to files
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.+)/?$ $1.php [L]
+
+# Handle directory requests
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{REQUEST_FILENAME}/index\.php -f
+RewriteRule ^(.+)/?$ $1/index.php [L]
+
