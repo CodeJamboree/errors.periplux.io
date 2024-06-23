@@ -22,6 +22,7 @@ this_proc: BEGIN
   SELECT SQL_CALC_FOUND_ROWS
     l.`id`,
     s.`scope`,
+    MIN(ld.`first_at`) AS `first_at`,
     MAX(ld.`last_at`) AS `last_at`,
     t.`type`,
     m.`message`,
@@ -43,7 +44,8 @@ this_proc: BEGIN
     p.`path`,
     l.`line`
   ORDER BY
-    MAX(ld.`last_at`) DESC
+    MAX(ld.`last_at`) DESC,
+    MIN(ld.`first_at`) ASC
   LIMIT p_page_size OFFSET v_page_offset;
   
   SET p_affected_rows = FOUND_ROWS();
