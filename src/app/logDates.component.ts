@@ -1,28 +1,40 @@
 /* eslint-disable no-console */
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { NgFor, CommonModule } from '@angular/common';
 import { LogDatesService } from './logDates.service';
 import { LogDateData } from './LogDateData';
+import { DurationPipe } from './DurationPipe';
+import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
+
 @Component({
   selector: 'app-log-dates',
   templateUrl: './logDates.component.html',
   styleUrls: ['./logDates.component.scss'],
-  imports: [NgFor, CommonModule],
+  imports: [
+    MatPaginatorModule,
+    NgFor,
+    CommonModule,
+    DurationPipe
+  ],
   standalone: true
 })
 export class LogDatesComponent implements OnInit {
   @Input() id!: string;
-  data: LogDateData[] = [];
+  @ViewChild('paginator') paginator!: MatPaginator
+  pageSizeOptions = [5, 10, 25, 50, 100];
   totalItems: number = 0;
-  currentPage: number = 1;
-  pageSize: number = 100;
-  totalPages: number = 0;
+  pageSize: number = 10;
+  pageIndex: number = 0;
+  data: LogDateData[] = [];
 
   constructor(private logDatesService: LogDatesService) {
   }
 
   ngOnInit() {
-    this.loadData(this.currentPage);
+    this.loadData(this.pageIndex, this.pageSize);
+  }
+  showPagnator() {
+    return (this.totalItems / this.pageSize) > 1;
   }
   graphDates() {
     if (this.data.length < 3) return "";
@@ -44,8 +56,8 @@ export class LogDatesComponent implements OnInit {
 
     const getX = (date: number) => gap + (((date - minTime) / timeRange) * (width - gap * 2));
     const getLineWidth = (count: number) => {
-      const minSize = gap / 10;
-      const maxSize = gap / 4;
+      const minSize = gap / 6;
+      const maxSize = gap / 2;
       const avgSize = (minSize + maxSize) / 2;
       const sizeRange = maxSize - minSize;
       if (countRange === 0) return avgSize;
@@ -86,30 +98,16 @@ export class LogDatesComponent implements OnInit {
     return canvas.toDataURL();
   }
 
-  loadData(pageNumber: number) {
-    this.logDatesService.getPage(this.id, pageNumber, this.pageSize)
+  loadData(pageIndex: number, pageSize: number) {
+    this.logDatesService.getPage(this.id, pageIndex + 1, pageSize)
       .subscribe(response => {
+        this.pageSize = pageSize;
+        this.pageIndex = pageIndex;
         this.data = response.data;
         this.totalItems = response.total;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
       });
   }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.loadData(this.currentPage);
-    }
-  }
-
-  previousPage() {
-    this.currentPage--;
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = this.totalPages;
-    }
-    if (this.currentPage <= 0) {
-      this.currentPage = 1;
-    }
-    this.loadData(this.currentPage);
+  handlePageEvent(event: PageEvent) {
+    this.loadData(event.pageIndex, event.pageSize);
   }
 }

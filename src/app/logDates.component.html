@@ -2,8 +2,8 @@
 <table class="striped">
   <thead>
     <tr>
-      <td>From</td>
-      <td>To</td>
+      <td>Started</td>
+      <td>Duration</td>
       <td>Occurances</td>
     </tr>
   </thead>
@@ -11,13 +11,12 @@
     <tr *ngFor="let item of data">
       <td attr.data-weekday="{{item.first_at * 1000 | date: 'c' }}" title="{{item.first_at * 1000 | date: 'full'}}">
         {{item.first_at * 1000 | date: 'short'}}</td>
-      <td attr.data-weekday="{{item.last_at * 1000 | date: 'c' }}" title="{{item.last_at * 1000 | date: 'full'}}">
-        {{item.last_at * 1000 | date: 'short'}}</td>
-      <td>{{item.count | number}}</td>
+      <td>
+        {{(item.last_at - item.first_at) * 1000 | duration}}</td>
+      <td class="number">{{item.count | number}}</td>
     </tr>
   </tbody>
 </table>
 
-<button (click)="previousPage()">Previous</button>
-<span>Page {{currentPage}} of {{ totalPages }}</span>
-<button (click)="nextPage()">Next</button>
+<mat-paginator *ngIf="showPagnator()" #paginator [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+  [length]="totalItems" [pageIndex]="pageIndex" (page)="handlePageEvent($event)"></mat-paginator>

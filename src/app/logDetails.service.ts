@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { LogDetailData } from './LogDetailData';
 import { map } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 
 interface PaginatedResponse<T> {
   data: T[];
@@ -24,6 +25,7 @@ export class LogDetailsService {
     return this.http.get<PaginatedResponse<LogDetailData>>(this.baseUrl, { params }).pipe(
       map(data => {
         data.data.forEach(async (item, i) => {
+          item.details = environment.censor(item.details);
         })
         return data;
       }));

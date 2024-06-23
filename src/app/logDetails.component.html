@@ -4,8 +4,6 @@
     <div class="content">{{item.details}}</div>
   </div>
 </div>
-<div *ngIf="totalPages > 1">
-  <button (click)="previousPage()">Previous</button>
-  <span>Page {{currentPage}} of {{ totalPages }}</span>
-  <button (click)="nextPage()">Next</button>
-</div>
+
+<mat-paginator *ngIf="showPagnator()" #paginator [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+  [length]="totalItems" [pageIndex]="pageIndex" (page)="handlePageEvent($event)"></mat-paginator>

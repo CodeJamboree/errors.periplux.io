@@ -9,23 +9,28 @@ import { generateMatrixImage } from './generateMatrixImage';
 import { errorTypeAsEmoji } from './errorTypeAsEmoji';
 import { MatButtonModule } from "@angular/material/button";
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
-import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'app-logs',
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.scss'],
   imports: [
-    MatPaginatorModule, NgFor, CommonModule, MatDialogModule, LogComponent, MatButtonModule],
+    MatPaginatorModule,
+    NgFor,
+    CommonModule,
+    MatDialogModule,
+    LogComponent,
+    MatButtonModule
+  ],
   standalone: true
 })
 export class LogsComponent implements OnInit {
   @ViewChild('paginator') paginator!: MatPaginator
   pageSizeOptions = [5, 10, 25, 50, 100];
-  data: LogData[] = [];
   totalItems: number = 0;
   pageSize: number = 25;
   pageIndex: number = 0;
+  data: LogData[] = [];
   isDialogOpen: boolean = false;
   errorTypeAsEmoji = errorTypeAsEmoji;
   generateMatrixImage = generateMatrixImage;
@@ -40,6 +45,8 @@ export class LogsComponent implements OnInit {
   loadData(pageIndex: number, pageSize: number) {
     this.logsService.getPage(pageIndex + 1, pageSize)
       .subscribe(response => {
+        this.pageSize = pageSize;
+        this.pageIndex = pageIndex;
         this.data = response.data;
         this.totalItems = response.total;
       });

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { LogData } from './LogData';
+import { environment } from '../environments/environment';
 
 interface PaginatedResponse<T> {
   data: T[];
@@ -24,6 +25,8 @@ export class LogsService {
       .pipe(
         map(data => {
           data.data.forEach(async (item, i) => {
+            item.path = environment.censor(item.path);
+            item.message = environment.censor(item.message);
             item.message_hash = await this.hash(item.message);
             item.scope_hash = await this.hash(item.scope);
             item.path_hash = await this.hash(item.path);
