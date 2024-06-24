@@ -1,50 +1,52 @@
 @import url(weekday-marker.scss);
 @import url(tables.scss);
 
-.message {
-  width: 300px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 table {
+  table-layout: fixed;
   font-family: Arial, Helvetica, sans-serif;
   font-size: smaller;
   width: 100%;
-}
 
-tbody[data-can-select="true"] tr:hover {
-  background-color: rgb(149, 197, 255);
-  color: white;
+  tbody {
+    tr {
+      cursor: default;
 
-  .path {
-    color: rgb(33, 133, 255);
+      .message {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-    &::after {
+      .path {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        direction: rtl;
+        position: relative;
+        text-align: right;
+        color: grey;
+
+        &::after {
+          content: attr(data-file);
+          color: black;
+          position: absolute;
+          right: 0;
+        }
+      }
+    }
+
+    tr:hover {
+      background-color: rgb(149, 197, 255);
       color: white;
+
+      .path {
+        color: rgb(33, 133, 255);
+
+        &::after {
+          color: white;
+        }
+      }
     }
   }
-}
 
-tbody tr {
-  cursor: default;
-
-  .path {
-    width: 200px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    direction: rtl;
-    position: relative;
-    text-align: right;
-    color: grey;
-
-    &::after {
-      content: attr(data-file);
-      color: black;
-      position: absolute;
-      right: 0;
-    }
-  }
 }
