@@ -2,8 +2,8 @@ const hashImages: Record<string, string> = {};
 
 export function generateMatrixImage(
   hash?: string,
-  horizontalCells: number = 4,
-  verticalCells: number = 4,
+  horizontalCells: number = 2,
+  verticalCells: number = 2,
   border: boolean = true
 ) {
   if (hash === undefined || hash === '') return "";
