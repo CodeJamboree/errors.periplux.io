@@ -2,12 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { LogDetailData } from './LogDetailData';
 import { map } from 'rxjs/operators';
-import { environment } from '../environments/environment';
-
-interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-}
+import { environment } from '../../environments/environment';
+import { PaginatedResponse } from '../types/PaginatedData';
 
 @Injectable({
   providedIn: 'root'

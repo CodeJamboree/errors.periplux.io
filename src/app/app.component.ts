@@ -1,6 +1,6 @@
-import { Component, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { LogsComponent } from './logs.component';
+import { LogsComponent } from './logs/logs.component';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +10,6 @@ import { LogsComponent } from './logs.component';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  // @ViewChild('logsContainer', { read: ViewContainerRef })
   title = 'Error Log';
 }
 

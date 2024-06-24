@@ -1,3 +1,7 @@
+/*
+ * Highlights individual keywords and quoted phrases
+*/
+
 const highlightedClass = 'highlight';
 const normalClass = 'no-light';
 
@@ -58,20 +62,15 @@ const buildPattern = (searchText: string) => {
   let encoded = searchText
     // regex encoding
     .replaceAll(/([[.*+?^$`()\\\]])/g, '\\$1')
-    // single charcter
-    .replaceAll('_', '.')
     // quotes
     .replaceAll(/"([^"]*?)"/g, (substring: string, ...args: any) => {
       // remove quotes and
       // prevent space from being 
       // turned into wildcard later
       return args[0].replaceAll(' ', '\\s');
-    })
-    // Trim wildcards
-    .replace(/^%*(.*?)%*$/, '$1')
-    ;
-  if (encoded.includes('%') || encoded.includes(' ')) {
-    // group wildcards % and spaces
+    });
+  if (encoded.includes(' ')) {
+    // group spaces
     encoded = '(' + encoded.replaceAll(/[% ]/g, ')(.*)(') + ')';
   }
   return new RegExp(encoded, 'gi');

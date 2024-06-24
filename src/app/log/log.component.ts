@@ -7,21 +7,21 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { LogData } from './LogData';
-import { LogDatesComponent } from './logDates.component';
-import { LogDetailsComponent } from './logDetails.component';
+import { LogData } from '../logs/LogData';
+import { LogDatesComponent } from '../logDates/logDates.component';
+import { LogDetailsComponent } from '../logDetails/logDetails.component';
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
 import { MatTableModule } from "@angular/material/table";
-import { generateMatrixImage } from './generateMatrixImage';
+import { generateMatrixImage } from '../logs/utils/generateMatrixImage';
 import { CommonModule } from '@angular/common';
-import { errorTypeAsEmoji } from './errorTypeAsEmoji';
-import { errorNumberAsType } from './errorNumberAsType';
-import { DurationPipe } from './DurationPipe';
-import { AgePipe } from './AgePipe';
-import { highlightSearchTerms } from './highlightSearchTerms';
+import { errorTypeAsEmoji } from '../logs/utils/errorTypeAsEmoji';
+import { errorNumberAsType } from '../logs/utils/errorNumberAsType';
+import { DurationPipe } from '../pipes/DurationPipe';
+import { AgePipe } from '../pipes/AgePipe';
+import { highlightSearchTerms } from '../search/highlightSearchTerms';
 
 interface NextLogEvent {
   id: number,

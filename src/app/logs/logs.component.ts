@@ -9,12 +9,12 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { LogsService } from './logs.service';
-import { LogComponent } from './log.component';
+import { LogComponent } from '../log/log.component';
 import { LogData } from './LogData';
-import { generateMatrixImage } from './generateMatrixImage';
-import { errorTypeAsEmoji } from './errorTypeAsEmoji';
-import { highlightSearchTerms } from './highlightSearchTerms';
-import { LogComponentData } from './LogComponentData';
+import { generateMatrixImage } from './utils/generateMatrixImage';
+import { errorTypeAsEmoji } from './utils/errorTypeAsEmoji';
+import { highlightSearchTerms } from '../search/highlightSearchTerms';
+import { LogComponentData } from '../log/LogComponentData';
 
 const defaultPageSize = 25;
 
@@ -117,7 +117,12 @@ export class LogsComponent implements OnInit {
       });
   }
   loadSelected() {
-    if (!this.selectedId || this.selectedId < 1) return;
+    if (!this.selectedId || this.selectedId < 1) {
+      // did we try to search for an error id?
+      if (!/^\d+$/.test(this.searchText)) return;
+      if (this.pageIndex !== 0) return;
+      this.selectedId = parseInt(this.searchText);
+    };
     const selected = this.data.find(({ id }) => id === this.selectedId);
     if (selected) {
       this.onRowClick(selected);

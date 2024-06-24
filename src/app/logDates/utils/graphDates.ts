@@ -1,4 +1,4 @@
-import { LogDateData } from "./LogDateData";
+import { LogDateData } from "../LogDateData";
 
 const minDateReducer = (min: number, { first_at }: LogDateData) => Math.min(first_at, min);
 const maxDateReducer = (max: number, { last_at }: LogDateData) => Math.max(last_at, max);
