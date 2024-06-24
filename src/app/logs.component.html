@@ -40,8 +40,8 @@
   <form>
     <mat-form-field appearance="fill" class="log-id-form">
       <mat-label>Log Id</mat-label>
-      <input matInput mat-form-field type="number" data-1p-ignore size="5" id="selectedId" [(ngModel)]="selectedId"
-        name="selectedId">
+      <input matInput mat-form-field type="number" min="1" data-1p-ignore size="5" id="selectedId"
+        [(ngModel)]="selectedId" name="selectedId">
     </mat-form-field>
     <button color="primary" mat-raised-button type="submit" (click)="loadSelected()">Lookup</button>
   </form>
