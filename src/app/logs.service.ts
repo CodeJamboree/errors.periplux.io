@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LogData } from './LogData';
 import { environment } from '../environments/environment';
@@ -7,6 +8,9 @@ import { environment } from '../environments/environment';
 interface PaginatedResponse<T> {
   data: T[];
   total: number;
+}
+interface ItemResponse<T> {
+  data: T
 }
 
 @Injectable({
@@ -17,7 +21,25 @@ export class LogsService {
 
   constructor(private http: HttpClient) { }
 
-  getPage(pageNumber: number, pageSize: number) {
+  getItem(id: number): Observable<LogData> {
+    let params = new HttpParams()
+      .set('id', id.toString());
+    return this.http.get<ItemResponse<LogData>>(`${environment.api}/log`, { params })
+      .pipe(
+        map(data => {
+          const items = [data.data];
+          items.forEach(async item => {
+            item.path = environment.censor(item.path);
+            item.message = environment.censor(item.message);
+            item.message_hash = await this.hash(item.message);
+            item.scope_hash = await this.hash(item.scope);
+            item.path_hash = await this.hash(item.path);
+          })
+          return items[0];
+        }));
+  }
+
+  getPage(pageNumber: number, pageSize: number): Observable<PaginatedResponse<LogData>> {
     let params = new HttpParams()
       .set('page', pageNumber.toString())
       .set('size', pageSize.toString());

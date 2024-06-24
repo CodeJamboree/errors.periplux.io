@@ -91,11 +91,20 @@ export class LogsComponent implements OnInit {
         this.data = response.data;
         this.totalItems = response.total;
         this.updateQueryPrams();
-        if (this.selectedId !== -1) {
-          const selected = this.data.find(({ id }) => id === this.selectedId);
-          if (selected) this.onRowClick(selected);
-        }
+        this.loadSelected();
       });
+  }
+  loadSelected() {
+    if (this.selectedId === -1) return;
+    const selected = this.data.find(({ id }) => id === this.selectedId);
+    if (selected) {
+      this.onRowClick(selected);
+      return;
+    }
+    this.logsService.getItem(this.selectedId)
+      .subscribe(item => {
+        this.onRowClick(item);
+      })
   }
   handlePageEvent(event: PageEvent) {
     this.loadData(event.pageIndex, event.pageSize);
