@@ -90,9 +90,28 @@ export class LogsComponent implements OnInit {
     config.data = item;
     config.disableClose = false;
     config.hasBackdrop = true;
+    config.minWidth = "50%";
+    config.maxWidth = "90%";
+    config.width = "1000px";
+    config.minHeight = "50%";
+    config.maxHeight = "90%";
+    config.height = "1000px";
 
-    const dialogRef = this.dialog.open(LogComponent, config);
-    dialogRef.afterClosed().subscribe(dialogResult => {
+    const dialogRef = this.dialog.open<LogComponent, LogData>(LogComponent, config);
+    dialogRef.componentInstance.nextItemEvent.subscribe(event => {
+      console.log('handling nextItemEvent for ' + item.id);
+      let index = this.data.findIndex(item => item.id === event.id);
+      index = ++index % this.data.length;
+      event.setLog(this.data[index]);
+    });
+    dialogRef.componentInstance.priorItemEvent.subscribe(event => {
+      console.log('handling priorItemEvent for ' + item.id);
+      let index = this.data.findIndex(item => item.id === event.id);
+      index--;
+      if (index < 0) index = this.data.length - 1;
+      event.setLog(this.data[index]);
+    });
+    dialogRef.afterClosed().subscribe(() => {
       this.isDialogOpen = false;
     });
   }

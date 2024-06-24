@@ -1,4 +1,4 @@
-<div class="list-container">
+<div *ngIf="hasData()" class="list-container">
   <div class="flex-list" *ngFor="let item of data">
     <div class="title">{{item.detail_type}}</div>
     <div class="content">{{item.details}}</div>

@@ -23,7 +23,9 @@ export class LogDetailsComponent implements OnInit {
 
   constructor(private logDetailsService: LogDetailsService) {
   }
-
+  hasData() {
+    return this.totalItems !== 0;
+  }
   ngOnInit() {
     this.loadData(this.pageIndex, this.pageSize);
   }

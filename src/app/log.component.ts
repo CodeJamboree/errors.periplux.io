@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, EventEmitter } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LogData } from './LogData';
 import { LogDatesComponent } from './logDates.component';
@@ -9,11 +9,16 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
 import { MatTableModule } from "@angular/material/table";
 import { generateMatrixImage } from './generateMatrixImage';
-import { NgFor, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { errorTypeAsEmoji } from './errorTypeAsEmoji';
 import { errorNumberAsType } from './errorNumberAsType';
 import { DurationPipe } from './DurationPipe';
 import { AgePipe } from './AgePipe';
+
+interface NextLogEvent {
+  id: number,
+  setLog: (data: LogData) => void
+};
 
 @Component({
   selector: 'app-log',
@@ -35,6 +40,8 @@ import { AgePipe } from './AgePipe';
 })
 export class LogComponent {
   item: LogData
+  nextItemEvent = new EventEmitter<NextLogEvent>();
+  priorItemEvent = new EventEmitter<NextLogEvent>();
 
   errorTypeAsEmoji = errorTypeAsEmoji;
   generateMatrixImage = generateMatrixImage;
@@ -57,8 +64,17 @@ export class LogComponent {
   durationMs() {
     return (this.item.last_at - this.item.first_at) * 1000;
   }
+  setData(data: LogData) {
+    this.item = data;
+  }
+  next() {
+    this.nextItemEvent.emit({ id: this.item.id, setLog: this.setData.bind(this) });
+  }
+  prior() {
+    this.priorItemEvent.emit({ id: this.item.id, setLog: this.setData.bind(this) });
+  }
   close() {
-    this.dialogRef.close(false);
+    this.dialogRef.close();
   }
 
 }
