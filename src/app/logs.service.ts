@@ -35,6 +35,7 @@ export class LogsService {
         }));
   }
   async hash(text: string): Promise<string> {
+    if (text.trim() === '') return '';
     const data = new TextEncoder().encode(text);
     const buffer: ArrayBuffer = await crypto.subtle.digest({ name: 'SHA-256' }, data);
     const hex = Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');

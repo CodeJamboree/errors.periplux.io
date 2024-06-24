@@ -6,7 +6,7 @@ export function generateMatrixImage(
   verticalCells: number = 4,
   border: boolean = true
 ) {
-  if (hash === undefined) return "";
+  if (hash === undefined || hash === '') return "";
 
   if (hash in hashImages) {
     return hashImages[hash];
