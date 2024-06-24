@@ -64,7 +64,6 @@ const parseTerms = (search: string) => {
   return terms;
 }
 
-
 const parseKeywords = (search: string) => search
   // white-space as space
   .replaceAll(/\s+/g, ' ')
