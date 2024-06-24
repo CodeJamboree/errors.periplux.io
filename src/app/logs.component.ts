@@ -116,6 +116,7 @@ export class LogsComponent implements OnInit {
     config.data = item;
     config.disableClose = false;
     config.hasBackdrop = true;
+    config.autoFocus = "#nextButton"
     config.minWidth = "50%";
     config.maxWidth = "90%";
     config.width = "1000px";
