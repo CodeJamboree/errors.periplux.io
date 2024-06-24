@@ -15,6 +15,7 @@ export const errorTypeAsEmoji = (type: string): string => {
   const locked = '\u{1f512}';
   const adhesiveBandage = '\u{1FA79}';
   const triangularRedFlag = '\u{1f6a9}';
+  const cardFileBox = '\u{1F5C3}';
   switch (lower) {
     // Standard
     case 'php error': return crossMark;
@@ -40,7 +41,10 @@ export const errorTypeAsEmoji = (type: string): string => {
     case 'php user deprecated': return backhandIndexPointingRight + downArrow;
     // Exception Handler / misc
     default:
-      if (lower.endsWith("error")) {
+      if (lower.startsWith('mysqli')) {
+        return cardFileBox + triangularRedFlag;
+      }
+      if (lower.endsWith("error") || lower.endsWith('exception')) {
         return triangularRedFlag;
       }
       return manShrugging;
