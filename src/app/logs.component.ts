@@ -115,6 +115,19 @@ export class LogsComponent implements OnInit {
   handlePageEvent(event: PageEvent) {
     this.loadData(event.pageIndex, event.pageSize);
   }
+  getNext(id: number | undefined, offset: number) {
+    let index = -1;
+    if (id !== undefined) {
+      index = this.data.findIndex(item => item.id === id);
+    }
+    index += offset;
+    if (index < 0) index = this.data.length - 1;
+    if (index >= this.data.length) index = 0;
+    const item = this.data[index];
+    this.selectedId = item.id;
+    this.updateQueryPrams();
+    return item;
+  }
   onRowClick(item: LogData) {
     if (this.isDialogOpen) return;
     this.isDialogOpen = true;
@@ -134,21 +147,10 @@ export class LogsComponent implements OnInit {
     this.updateQueryPrams();
     const dialogRef = this.dialog.open<LogComponent, LogData>(LogComponent, config);
     dialogRef.componentInstance.nextItemEvent.subscribe(event => {
-      console.log('handling nextItemEvent for ' + item.id);
-      let index = this.data.findIndex(item => item.id === event.id);
-      index = ++index % this.data.length;
-      this.selectedId = this.data[index].id;
-      this.updateQueryPrams();
-      event.setLog(this.data[index]);
+      event.setLog(this.getNext(event.id, 1));
     });
     dialogRef.componentInstance.priorItemEvent.subscribe(event => {
-      console.log('handling priorItemEvent for ' + item.id);
-      let index = this.data.findIndex(item => item.id === event.id);
-      index--;
-      if (index < 0) index = this.data.length - 1;
-      this.selectedId = this.data[index].id;
-      this.updateQueryPrams();
-      event.setLog(this.data[index]);
+      event.setLog(this.getNext(event.id, -1));
     });
     dialogRef.afterClosed().subscribe(() => {
       this.isDialogOpen = false;

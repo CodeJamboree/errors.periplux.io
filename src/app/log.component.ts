@@ -1,4 +1,11 @@
-import { Component, Inject, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Inject,
+  EventEmitter,
+  OnInit,
+  OnDestroy
+} from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LogData } from './LogData';
 import { LogDatesComponent } from './logDates.component';
@@ -38,7 +45,7 @@ interface NextLogEvent {
   ],
   standalone: true
 })
-export class LogComponent {
+export class LogComponent implements OnInit, OnDestroy {
   item: LogData
   nextItemEvent = new EventEmitter<NextLogEvent>();
   priorItemEvent = new EventEmitter<NextLogEvent>();
@@ -46,13 +53,37 @@ export class LogComponent {
   errorTypeAsEmoji = errorTypeAsEmoji;
   generateMatrixImage = generateMatrixImage;
   errorNumberAsType = errorNumberAsType;
+  boundKeydown: (event: KeyboardEvent) => void;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: LogData,
+    @Inject(DOCUMENT) private document: Document,
     public dialog: MatDialog,
     private dialogRef: MatDialogRef<LogComponent>
   ) {
     this.item = data;
+    this.boundKeydown = this.handleKeydown.bind(this);
+  }
+  handleKeydown({ key, code }: KeyboardEvent) {
+    const name = key ?? code;
+    switch (name) {
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        this.prior();
+        return;
+      case 'ArrowRight':
+      case 'ArrowDown':
+        this.next();
+        return;
+      default: break;
+    }
+  }
+  ngOnInit(): void {
+    this.boundKeydown = this.handleKeydown.bind(this);
+    this.document.addEventListener('keydown', this.boundKeydown);
+  }
+  ngOnDestroy(): void {
+    this.document.removeEventListener('keydown', this.boundKeydown);
   }
   evaluatedType() {
     return errorNumberAsType(this.item.type);
@@ -76,5 +107,4 @@ export class LogComponent {
   close() {
     this.dialogRef.close();
   }
-
 }
