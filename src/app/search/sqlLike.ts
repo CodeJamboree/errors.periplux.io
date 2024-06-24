@@ -34,8 +34,8 @@
 
 export const sqlLike = (search: string) => {
   if (search.trim() === '') return '';
-  search = escape(search);
-  const terms = parseTerms(search);
+  const escaped = escape(search);
+  const terms = parseTerms(escaped);
   return anywhere(terms.join('%'));
 }
 
@@ -46,12 +46,12 @@ const parseTerms = (search: string) => {
   const terms = [];
 
   // non-quoted + quoted
-  const pattern = /([^"]*)"([^"]*)"/g;
+  const pattern = /([^"]*)("([^"]*)")?/g;
   const matches = search.matchAll(pattern);
 
   for (const match of matches) {
-    const keywords = match[1].trim();
-    const phrase = match[2].trim();
+    const keywords = match[1]?.trim() ?? '';
+    const phrase = match[3]?.trim() ?? '';
 
     if (keywords !== '') {
       terms.push(...parseKeywords(keywords));
