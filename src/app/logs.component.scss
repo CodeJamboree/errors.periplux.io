@@ -35,7 +35,8 @@ table {
       }
     }
 
-    tr:hover {
+    tr:hover,
+    tr.selected {
       background-color: rgb(149, 197, 255);
       color: white;
 

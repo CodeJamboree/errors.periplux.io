@@ -33,6 +33,7 @@ export class LogsComponent implements OnInit {
   totalItems: number = 0;
   pageSize: number = defaultPageSize;
   pageIndex: number = -1;
+  selectedId: number = -1;
   data: LogData[] = [];
   isDialogOpen: boolean = false;
   errorTypeAsEmoji = errorTypeAsEmoji;
@@ -97,11 +98,13 @@ export class LogsComponent implements OnInit {
     config.maxHeight = "90%";
     config.height = "1000px";
 
+    this.selectedId = item.id;
     const dialogRef = this.dialog.open<LogComponent, LogData>(LogComponent, config);
     dialogRef.componentInstance.nextItemEvent.subscribe(event => {
       console.log('handling nextItemEvent for ' + item.id);
       let index = this.data.findIndex(item => item.id === event.id);
       index = ++index % this.data.length;
+      this.selectedId = this.data[index].id;
       event.setLog(this.data[index]);
     });
     dialogRef.componentInstance.priorItemEvent.subscribe(event => {
@@ -109,11 +112,16 @@ export class LogsComponent implements OnInit {
       let index = this.data.findIndex(item => item.id === event.id);
       index--;
       if (index < 0) index = this.data.length - 1;
+      this.selectedId = this.data[index].id;
       event.setLog(this.data[index]);
     });
     dialogRef.afterClosed().subscribe(() => {
       this.isDialogOpen = false;
+      this.selectedId = -1;
     });
+  }
+  selectedClass(id: number) {
+    return id === this.selectedId ? 'selected' : '';
   }
   parseFile(path: string) {
     const i = path.lastIndexOf('/');
