@@ -35,24 +35,15 @@
 export const sqlLike = (search: string) => {
   if (search.trim() === '') return '';
   search = escape(search);
-  search = search.includes('"') ? withPhrases(search) : withKeywords(search);
-  return anywhere(search);
+  const terms = parseTerms(search);
+  return anywhere(terms.join('%'));
 }
 
 const escape = (search: string) => search.replaceAll(/([%_])/g, '\\$1');
 const anywhere = (search: string) => `%${search}%`;
 
-const withKeywords = (search: string) => search
-  // white-space as space
-  .replaceAll(/\s+/g, ' ')
-  // double-space as single
-  .replaceAll('  ', ' ')
-  .trim()
-  // space as wildcard
-  .replaceAll(' ', '%');
-
-const withPhrases = (search: string) => {
-  let like = '';
+const parseTerms = (search: string) => {
+  const terms = [];
 
   // non-quoted + quoted
   const pattern = /([^"]*)"([^"]*)"/g;
@@ -63,14 +54,22 @@ const withPhrases = (search: string) => {
     const phrase = match[2].trim();
 
     if (keywords !== '') {
-      if (like.length !== 0) like += '%';
-      like += withKeywords(keywords);
+      terms.push(...parseKeywords(keywords));
     }
 
     if (phrase !== '') {
-      if (like.length !== 0) like += '%';
-      like += phrase;
+      terms.push(phrase);
     }
   }
-  return like;
+  return terms;
 }
+
+
+const parseKeywords = (search: string) => search
+  // white-space as space
+  .replaceAll(/\s+/g, ' ')
+  // double-space as single
+  .replaceAll('  ', ' ')
+  .trim()
+  .split(' ')
+  .filter(Boolean);
