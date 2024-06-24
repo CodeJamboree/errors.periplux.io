@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { LogsComponent } from './logs/logs.component';
+import { LogsComponent } from '../logs/logs.component';
 
 @Component({
   selector: 'app-root',
