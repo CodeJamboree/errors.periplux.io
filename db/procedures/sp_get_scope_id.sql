@@ -12,15 +12,11 @@ this_proc: BEGIN
 
   SET p_scope_id = NULL;
 
-  IF p_scope IS NULL OR p_scope = '' THEN
-    LEAVE this_proc;
+  IF p_scope IS NULL THEN
+    SET p_scope = '';
   END IF;
 
   SET p_scope = TRIM(p_scope);
-
-  IF p_scope = '' THEN
-    LEAVE this_proc;
-  END IF;
 
   SELECT `id` INTO p_scope_id FROM `scopes` WHERE `scope` = p_scope LIMIT 1;
 

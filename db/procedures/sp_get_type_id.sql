@@ -12,15 +12,11 @@ this_proc: BEGIN
 
   SET p_type_id = NULL;
 
-  IF p_type IS NULL OR p_type = '' THEN
-    LEAVE this_proc;
+  IF p_type IS NULL THEN
+    SET p_type = '';
   END IF;
 
   SET p_type = TRIM(p_type);
-
-  IF p_type = '' THEN
-    LEAVE this_proc;
-  END IF;
 
   SELECT `id` INTO p_type_id FROM `types` WHERE `type` = p_type LIMIT 1;
 

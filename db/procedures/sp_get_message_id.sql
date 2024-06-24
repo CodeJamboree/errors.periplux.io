@@ -12,15 +12,11 @@ this_proc: BEGIN
 
   SET p_message_id = NULL;
 
-  IF p_message IS NULL OR p_message = '' THEN
-    LEAVE this_proc;
+  IF p_message IS NULL THEN
+    SET p_message = '';
   END IF;
 
   SET p_message = TRIM(p_message);
-
-  IF p_message = '' THEN
-    LEAVE this_proc;
-  END IF;
 
   SELECT `id` INTO p_message_id FROM `messages` WHERE `message` = p_message LIMIT 1;
 

@@ -12,15 +12,11 @@ this_proc: BEGIN
 
   SET p_path_id = NULL;
 
-  IF p_path IS NULL OR p_path = '' THEN
-    LEAVE this_proc;
+  IF p_path IS NULL THEN
+    SET p_path = '';
   END IF;
 
   SET p_path = TRIM(p_path);
-
-  IF p_path = '' THEN
-    LEAVE this_proc;
-  END IF;
 
   SELECT `id` INTO p_path_id FROM `paths` WHERE `path` = p_path LIMIT 1;
 
