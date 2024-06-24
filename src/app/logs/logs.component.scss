@@ -22,9 +22,51 @@ table {
   font-size: smaller;
   width: 100%;
 
+  thead {
+    .id {
+      width: 40px;
+    }
+
+    .icon {
+      width: 32px;
+    }
+
+    .date {
+      width: 50px;
+    }
+
+    .time {
+      width: 60px;
+    }
+
+    .type {
+      width: 45px;
+    }
+
+    .path {
+      width: 200px;
+    }
+
+    .line {
+      width: 40px;
+    }
+
+    .count {
+      width: 40px;
+    }
+  }
+
   tbody {
     tr {
       cursor: default;
+
+      .icon {
+        text-align: center
+      }
+
+      .type {
+        text-align: center;
+      }
 
       .message {
         white-space: nowrap;
@@ -33,19 +75,21 @@ table {
       }
 
       .path {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        direction: rtl;
-        position: relative;
-        text-align: right;
-        color: grey;
+        div {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          direction: rtl;
+          position: relative;
+          text-align: right;
+          color: grey;
 
-        &::after {
-          content: attr(data-file);
-          color: black;
-          position: absolute;
-          right: 0;
+          &::after {
+            content: attr(data-file);
+            color: black;
+            position: absolute;
+            right: 0;
+          }
         }
       }
     }

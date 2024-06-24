@@ -12,49 +12,51 @@
 <table class="striped">
   <thead>
     <tr>
-      <td width="50">Log</td>
-      <td width="32">App</td>
-      <td width="50">date</td>
-      <td width="60">time</td>
-      <td width="32">type</td>
-      <td width="32"></td>
-      <td>message</td>
-      <td width="32"></td>
-      <td width="200">path</td>
-      <td width="40">line</td>
-      <td width="50">count</td>
+      <td class="id">Log</td>
+      <td class="icon">App</td>
+      <td class="date">date</td>
+      <td class="time">time</td>
+      <td class="type">type</td>
+      <td class="icon"></td>
+      <td class="message">message</td>
+      <td class="icon"></td>
+      <td class="path">path</td>
+      <td class="line">line</td>
+      <td class="count">count</td>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let item of data" (click)="onRowClick(item)" class="{{selectedClass(item.id)}}">
-      <td class="number">{{item.id}}</td>
-      <td title="{{item.scope}}"><img src="{{ generateMatrixImage(item.scope_hash)}}"></td>
-      <td title="{{item.last_at * 1000 | date: 'fullDate'}}" attr.data-weekday="{{item.last_at * 1000 | date: 'c' }}">
+      <td class="id number">{{item.id}}</td>
+      <td class="icon" title="{{item.scope}}"><img src="{{ generateMatrixImage(item.scope_hash)}}"></td>
+      <td class="date" title="{{item.last_at * 1000 | date: 'fullDate'}}"
+        attr.data-weekday="{{item.last_at * 1000 | date: 'c' }}">
         {{item.last_at * 1000 | date: 'shortDate'}}</td>
-      <td title="{{item.last_at * 1000 | date: 'fullTime'}}">{{item.last_at * 1000 | date: 'shortTime'}}</td>
-      <td title="{{item.type}}">{{errorTypeAsEmoji(item.type)}}</td>
-      <td><img src="{{ generateMatrixImage(item.message_hash)}}"></td>
-      <td title=" {{item.message}}">
-        <div class="message" *ngIf="searchText">
+      <td class="time" title="{{item.last_at * 1000 | date: 'fullTime'}}">{{item.last_at * 1000 | date: 'shortTime'}}
+      </td>
+      <td class="type" title="{{item.type}}">{{errorTypeAsEmoji(item.type)}}</td>
+      <td class="icon"><img src="{{ generateMatrixImage(item.message_hash)}}"></td>
+      <td class="message" title=" {{item.message}}">
+        <div *ngIf="searchText">
           <span *ngFor="let part of searchParts(item.message)">
             <span class="{{part.className}}">{{part.text}}</span>
           </span>
         </div>
-        <div class="message" *ngIf="!searchText">{{item.message}}</div>
+        <div *ngIf="!searchText">{{item.message}}</div>
       </td>
-      <td><img src="{{ generateMatrixImage(item.path_hash)}}"></td>
-      <td title="{{item.path}}">
-        <div class="path" *ngIf="searchText">
+      <td class="icon"><img src="{{ generateMatrixImage(item.path_hash)}}"></td>
+      <td class="path" title="{{item.path}}">
+        <div *ngIf="searchText" attr.data-file="{{parseFile(item.path)}}">
           <span *ngFor="let part of searchParts(item.path)">
             <span class="{{part.className}}">&lrm;{{part.text}}</span>
           </span>
         </div>
-        <div class="path" *ngIf="!searchText" attr.data-file="{{parseFile(item.path)}}">
+        <div *ngIf="!searchText" attr.data-file="{{parseFile(item.path)}}">
           &lrm;{{item.path}}
         </div>
       </td>
-      <td class="number">{{item.line >= 0 ? item.line : '' | number}}</td>
-      <td class="number">{{item.count | number}}</td>
+      <td class="line number">{{item.line >= 0 ? item.line : '' | number}}</td>
+      <td class="count number">{{item.count | number}}</td>
     </tr>
   </tbody>
 </table>
