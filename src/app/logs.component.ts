@@ -146,6 +146,7 @@ export class LogsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(() => {
       this.isDialogOpen = false;
       this.selectedId = -1;
+      this.updateQueryPrams();
     });
   }
   selectedClass(id: number) {
