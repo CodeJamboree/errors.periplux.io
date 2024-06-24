@@ -52,17 +52,34 @@ export class LogsComponent implements OnInit {
       if (event instanceof NavigationEnd) {
         const page = this.activatedRoute.snapshot.queryParamMap.get('page');
         const size = this.activatedRoute.snapshot.queryParamMap.get('size');
+        const id = this.activatedRoute.snapshot.queryParamMap.get('id');
+
         let pageIndex = page ? parseInt(page, 10) - 1 : 0;
         if (pageIndex < 0) pageIndex = 0;
         let pageSize = size ? parseInt(size, 10) : defaultPageSize;
         if (!this.pageSizeOptions.includes(pageSize)) {
           pageSize = defaultPageSize;
         }
+        let logId = id ? parseInt(id, 10) : -1;
+        this.selectedId = logId;
         this.loadData(pageIndex, pageSize);
       }
     });
   }
 
+  updateQueryPrams() {
+    const queryParams: {
+      page?: number,
+      size?: number,
+      id?: number
+    } = {};
+    if (this.pageIndex !== 0) queryParams.page = this.pageIndex + 1;
+    if (this.pageSize !== defaultPageSize) queryParams.size = this.pageSize;
+    if (this.selectedId !== -1) queryParams.id = this.selectedId;
+    this.router.navigate([''], {
+      queryParams
+    })
+  }
   loadData(pageIndex: number, pageSize: number) {
     if (pageIndex === this.pageIndex && pageSize === this.pageSize) {
       return;
@@ -73,12 +90,11 @@ export class LogsComponent implements OnInit {
         this.pageIndex = pageIndex;
         this.data = response.data;
         this.totalItems = response.total;
-        this.router.navigate([''], {
-          queryParams: {
-            page: pageIndex + 1,
-            size: pageSize
-          }
-        })
+        this.updateQueryPrams();
+        if (this.selectedId !== -1) {
+          const selected = this.data.find(({ id }) => id === this.selectedId);
+          if (selected) this.onRowClick(selected);
+        }
       });
   }
   handlePageEvent(event: PageEvent) {
@@ -99,12 +115,14 @@ export class LogsComponent implements OnInit {
     config.height = "1000px";
 
     this.selectedId = item.id;
+    this.updateQueryPrams();
     const dialogRef = this.dialog.open<LogComponent, LogData>(LogComponent, config);
     dialogRef.componentInstance.nextItemEvent.subscribe(event => {
       console.log('handling nextItemEvent for ' + item.id);
       let index = this.data.findIndex(item => item.id === event.id);
       index = ++index % this.data.length;
       this.selectedId = this.data[index].id;
+      this.updateQueryPrams();
       event.setLog(this.data[index]);
     });
     dialogRef.componentInstance.priorItemEvent.subscribe(event => {
@@ -113,6 +131,7 @@ export class LogsComponent implements OnInit {
       index--;
       if (index < 0) index = this.data.length - 1;
       this.selectedId = this.data[index].id;
+      this.updateQueryPrams();
       event.setLog(this.data[index]);
     });
     dialogRef.afterClosed().subscribe(() => {
