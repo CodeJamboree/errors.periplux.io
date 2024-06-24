@@ -6,6 +6,7 @@ require_once "parse_logs.php";
 
 function main()
 {
+    $ext = '.log';
 
 // Show::error("Unauthorized");
 // exit;
