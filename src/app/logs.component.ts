@@ -2,8 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgFor, CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatButtonModule } from "@angular/material/button";
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { LogsService } from './logs.service';
 import { LogComponent } from './log.component';
@@ -23,7 +26,10 @@ const defaultPageSize = 25;
     CommonModule,
     MatDialogModule,
     LogComponent,
-    MatButtonModule
+    MatButtonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   standalone: true
 })
@@ -33,7 +39,7 @@ export class LogsComponent implements OnInit {
   totalItems: number = 0;
   pageSize: number = defaultPageSize;
   pageIndex: number = -1;
-  selectedId: number = -1;
+  selectedId?: number;
   data: LogData[] = [];
   isDialogOpen: boolean = false;
   errorTypeAsEmoji = errorTypeAsEmoji;
@@ -60,7 +66,7 @@ export class LogsComponent implements OnInit {
         if (!this.pageSizeOptions.includes(pageSize)) {
           pageSize = defaultPageSize;
         }
-        let logId = id ? parseInt(id, 10) : -1;
+        let logId = id ? parseInt(id, 10) : undefined;
         this.selectedId = logId;
         this.loadData(pageIndex, pageSize);
       }
@@ -75,7 +81,7 @@ export class LogsComponent implements OnInit {
     } = {};
     if (this.pageIndex !== 0) queryParams.page = this.pageIndex + 1;
     if (this.pageSize !== defaultPageSize) queryParams.size = this.pageSize;
-    if (this.selectedId !== -1) queryParams.id = this.selectedId;
+    if (this.selectedId && this.selectedId > 0) queryParams.id = this.selectedId;
     this.router.navigate([''], {
       queryParams
     })
@@ -95,7 +101,7 @@ export class LogsComponent implements OnInit {
       });
   }
   loadSelected() {
-    if (this.selectedId === -1) return;
+    if (!this.selectedId || this.selectedId < 1) return;
     const selected = this.data.find(({ id }) => id === this.selectedId);
     if (selected) {
       this.onRowClick(selected);
@@ -146,7 +152,7 @@ export class LogsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(() => {
       this.isDialogOpen = false;
-      this.selectedId = -1;
+      this.selectedId = undefined;
       this.updateQueryPrams();
     });
   }
