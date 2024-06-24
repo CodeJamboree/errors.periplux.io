@@ -11,6 +11,8 @@ this_proc: BEGIN
   DECLARE v_date_id INT;
   DECLARE v_first_at BIGINT;
   DECLARE v_last_at BIGINT;
+  DECLARE v_consolidate_seconds INT;
+  SET v_consolidate_seconds = 60;
 
   IF p_created_at IS NULL OR p_log_id IS NULL THEN
     LEAVE this_proc;
@@ -21,13 +23,7 @@ this_proc: BEGIN
   FROM `log_dates`
   WHERE
     `log_id` = p_log_id
-    AND (
-        p_created_at BETWEEN `first_at` AND `last_at`
-        OR (
-          p_created_at >= `first_at` - 5
-          AND p_created_at <= `last_at` + 5
-        )
-    )
+    AND p_created_at BETWEEN `first_at` - v_consolidate_seconds AND `last_at` + v_consolidate_seconds
   LIMIT 1;
 
   IF v_date_id IS NULL THEN
