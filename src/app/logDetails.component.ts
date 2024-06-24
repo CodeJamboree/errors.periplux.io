@@ -4,6 +4,7 @@ import { NgFor, CommonModule } from '@angular/common';
 import { LogDetailsService } from './logDetails.service';
 import { LogDetailData } from './LogDetailData';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
+import { highlightSearchTerms } from './highlightSearchTerms';
 
 @Component({
   selector: 'app-log-details',
@@ -14,6 +15,7 @@ import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/p
 })
 export class LogDetailsComponent implements OnInit {
   @Input() id!: string;
+  @Input() search!: string;
   @ViewChild('paginator') paginator!: MatPaginator
   pageSizeOptions = [5, 10, 25, 50, 100];
   totalItems: number = 0;
@@ -44,5 +46,8 @@ export class LogDetailsComponent implements OnInit {
   }
   showPagnator() {
     return (this.totalItems / this.pageSize) > 1;
+  }
+  searchParts(text: string) {
+    return highlightSearchTerms(text, this.search);
   }
 }

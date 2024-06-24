@@ -21,6 +21,7 @@ import { errorTypeAsEmoji } from './errorTypeAsEmoji';
 import { errorNumberAsType } from './errorNumberAsType';
 import { DurationPipe } from './DurationPipe';
 import { AgePipe } from './AgePipe';
+import { highlightSearchTerms } from './highlightSearchTerms';
 
 interface NextLogEvent {
   id: number,
@@ -47,6 +48,7 @@ interface NextLogEvent {
 })
 export class LogComponent implements OnInit, OnDestroy {
   item: LogData
+  searchText: string = '';
   nextItemEvent = new EventEmitter<NextLogEvent>();
   priorItemEvent = new EventEmitter<NextLogEvent>();
 
@@ -56,12 +58,13 @@ export class LogComponent implements OnInit, OnDestroy {
   boundKeydown: (event: KeyboardEvent) => void;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: LogData,
+    @Inject(MAT_DIALOG_DATA) public data: { item: LogData, search: string },
     @Inject(DOCUMENT) private document: Document,
     public dialog: MatDialog,
     private dialogRef: MatDialogRef<LogComponent>
   ) {
-    this.item = data;
+    this.item = data.item;
+    this.searchText = data.search;
     this.boundKeydown = this.handleKeydown.bind(this);
   }
   handleKeydown({ key, code }: KeyboardEvent) {
@@ -91,6 +94,9 @@ export class LogComponent implements OnInit, OnDestroy {
   originalType() {
     if (this.evaluatedType() === this.item.type) return "";
     return `(${this.item.type})`;
+  }
+  searchParts(text: string) {
+    return highlightSearchTerms(text, this.searchText);
   }
   durationMs() {
     return (this.item.last_at - this.item.first_at) * 1000;

@@ -13,6 +13,8 @@ import { LogComponent } from './log.component';
 import { LogData } from './LogData';
 import { generateMatrixImage } from './generateMatrixImage';
 import { errorTypeAsEmoji } from './errorTypeAsEmoji';
+import { highlightSearchTerms } from './highlightSearchTerms';
+import { LogComponentData } from './LogComponentData';
 
 const defaultPageSize = 25;
 
@@ -40,6 +42,8 @@ export class LogsComponent implements OnInit {
   pageSize: number = defaultPageSize;
   pageIndex: number = -1;
   selectedId?: number;
+  searchInput: string = '';
+  searchText: string = '';
   data: LogData[] = [];
   isDialogOpen: boolean = false;
   errorTypeAsEmoji = errorTypeAsEmoji;
@@ -59,6 +63,7 @@ export class LogsComponent implements OnInit {
         const page = this.activatedRoute.snapshot.queryParamMap.get('page');
         const size = this.activatedRoute.snapshot.queryParamMap.get('size');
         const id = this.activatedRoute.snapshot.queryParamMap.get('id');
+        const searchText = this.activatedRoute.snapshot.queryParamMap.get('search') ?? '';
 
         let pageIndex = page ? parseInt(page, 10) - 1 : 0;
         if (pageIndex < 0) pageIndex = 0;
@@ -67,8 +72,10 @@ export class LogsComponent implements OnInit {
           pageSize = defaultPageSize;
         }
         let logId = id ? parseInt(id, 10) : undefined;
+
         this.selectedId = logId;
-        this.loadData(pageIndex, pageSize);
+        this.searchInput = searchText;
+        this.loadData(pageIndex, pageSize, searchText);
       }
     });
   }
@@ -77,23 +84,32 @@ export class LogsComponent implements OnInit {
     const queryParams: {
       page?: number,
       size?: number,
-      id?: number
+      id?: number,
+      search?: string
     } = {};
     if (this.pageIndex !== 0) queryParams.page = this.pageIndex + 1;
     if (this.pageSize !== defaultPageSize) queryParams.size = this.pageSize;
     if (this.selectedId && this.selectedId > 0) queryParams.id = this.selectedId;
+    if (this.searchText.trim() !== '') queryParams.search = this.searchText.trim();
     this.router.navigate([''], {
       queryParams
     })
   }
-  loadData(pageIndex: number, pageSize: number) {
-    if (pageIndex === this.pageIndex && pageSize === this.pageSize) {
+  search() {
+    this.loadData(0, this.pageSize, this.searchInput);
+  }
+  searchParts(text: string) {
+    return highlightSearchTerms(text, this.searchText);
+  }
+  loadData(pageIndex: number, pageSize: number, search: string) {
+    if (pageIndex === this.pageIndex && pageSize === this.pageSize && search === this.searchText) {
       return;
     }
-    this.logsService.getPage(pageIndex + 1, pageSize)
+    this.logsService.getPage(pageIndex + 1, pageSize, search)
       .subscribe(response => {
         this.pageSize = pageSize;
         this.pageIndex = pageIndex;
+        this.searchText = search;
         this.data = response.data;
         this.totalItems = response.total;
         this.updateQueryPrams();
@@ -113,7 +129,7 @@ export class LogsComponent implements OnInit {
       })
   }
   handlePageEvent(event: PageEvent) {
-    this.loadData(event.pageIndex, event.pageSize);
+    this.loadData(event.pageIndex, event.pageSize, this.searchText);
   }
   getNext(id: number | undefined, offset: number) {
     let index = -1;
@@ -131,8 +147,8 @@ export class LogsComponent implements OnInit {
   onRowClick(item: LogData) {
     if (this.isDialogOpen) return;
     this.isDialogOpen = true;
-    const config = new MatDialogConfig<LogData>();
-    config.data = item;
+    const config = new MatDialogConfig<LogComponentData>();
+    config.data = { item, search: this.searchText };
     config.disableClose = false;
     config.hasBackdrop = true;
     config.autoFocus = "#nextButton"
@@ -145,7 +161,7 @@ export class LogsComponent implements OnInit {
 
     this.selectedId = item.id;
     this.updateQueryPrams();
-    const dialogRef = this.dialog.open<LogComponent, LogData>(LogComponent, config);
+    const dialogRef = this.dialog.open<LogComponent, LogComponentData>(LogComponent, config);
     dialogRef.componentInstance.nextItemEvent.subscribe(event => {
       event.setLog(this.getNext(event.id, 1));
     });

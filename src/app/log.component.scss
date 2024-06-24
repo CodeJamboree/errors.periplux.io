@@ -1,10 +1,11 @@
 @import url(weekday-marker.scss);
 @import url(tables.scss);
+@import url(highlight.scss);
 
 table {
   table-layout: fixed;
 
-  .message {
+  .scroll {
     overflow: auto;
   }
 }

@@ -1,7 +1,21 @@
 <div *ngIf="hasData()" class="list-container">
   <div class="flex-list" *ngFor="let item of data">
-    <div class="title">{{item.detail_type}}</div>
-    <div class="content">{{item.details}}</div>
+    <div class="title">
+      <span *ngIf="search">
+        <span *ngFor="let part of searchParts(item.detail_type)">
+          <span class="{{part.className}}">{{part.text}}</span>
+        </span>
+      </span>
+      <span *ngIf="!search">{{item.detail_type}}</span>
+    </div>
+    <div class="content">
+      <span *ngIf="search">
+        <span *ngFor="let part of searchParts(item.details)">
+          <span class="{{part.className}}">{{part.text}}</span>
+        </span>
+      </span>
+      <span *ngIf="!search">{{item.details}}</span>
+    </div>
   </div>
 </div>
 

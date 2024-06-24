@@ -17,7 +17,13 @@
         <td>Scope</td>
         <td>
           <img src="{{generateMatrixImage(item.scope_hash)}}">
-          {{ item.scope }}
+          <span *ngIf="searchText">
+            <span *ngFor="let part of searchParts(item.scope)">
+              <span class="{{part.className}}">{{part.text}}</span>
+            </span>
+          </span>
+          <span *ngIf="!searchText">{{item.scope}}</span>
+
         </td>
       </tr>
       <tr>
@@ -42,22 +48,44 @@
       </tr>
       <tr>
         <td>Type</td>
-        <td>{{ errorTypeAsEmoji(item.type) }} {{ evaluatedType() }} {{ originalType() }} </td>
+        <td>
+          {{ errorTypeAsEmoji(item.type) }}
+          <span *ngIf="searchText">
+            <span *ngFor="let part of searchParts(evaluatedType())">
+              <span class="{{part.className}}">{{part.text}}</span>
+            </span>
+            <span *ngFor="let part of searchParts(originalType())">
+              <span class="{{part.className}}">{{part.text}}</span>
+            </span>
+          </span>
+
+          <span *ngIf="!searchText">{{ evaluatedType() }} {{ originalType() }} </span>
+
+        </td>
       </tr>
       <tr>
         <td>Message</td>
-        <td>
-          <div class="message">
-            <img src="{{generateMatrixImage(item.message_hash)}}">
-            {{ item.message }}
-          </div>
+        <td class="scroll">
+          <img src="{{generateMatrixImage(item.message_hash)}}">
+          <span *ngIf="searchText">
+
+            <span *ngFor="let part of searchParts(item.message)">
+              <span class="{{part.className}}">{{part.text}}</span>
+            </span>
+          </span>
+          <span *ngIf="!searchText">{{item.message}}</span>
         </td>
       </tr>
       <tr>
         <td>Path</td>
-        <td>
+        <td class="scroll">
           <img src="{{generateMatrixImage(item.path_hash)}}">
-          {{ item.path }}
+          <span *ngIf="searchText">
+            <span *ngFor="let part of searchParts(item.path)">
+              <span class="{{part.className}}">{{part.text}}</span>
+            </span>
+          </span>
+          <span *ngIf="!searchText">{{item.path}}</span>
         </td>
       </tr>
       <tr>
@@ -66,7 +94,7 @@
       </tr>
     </tbody>
   </table>
-  <app-log-details id="{{ item.id }}"></app-log-details>
+  <app-log-details id="{{ item.id }}" search="{{ searchText }}"></app-log-details>
   <app-log-dates id="{{ item.id }}"></app-log-dates>
 
 </div>

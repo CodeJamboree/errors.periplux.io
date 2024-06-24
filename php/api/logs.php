@@ -7,6 +7,7 @@ function main()
 {
     $page = $_GET['page'] ?? 1;
     $size = $_GET['size'] ?? 5;
+    $search = $_GET['search'] ?? '';
 
     $credentials = Secrets::revealAs("ERROR_DATABASE", 'array');
     if ($credentials === false) {
@@ -21,10 +22,11 @@ function main()
     }
 
     $rows = $db->selectRows(
-        'CALL sp_page_logs(?, ?, @affected_rows)',
-        'ii',
+        'CALL sp_page_logs(?, ?, ?, @affected_rows)',
+        'iis',
         $page,
-        $size
+        $size,
+        $search
     );
 
     $total = $db->selectScalar('SELECT @affected_rows');
@@ -36,9 +38,4 @@ function main()
     exit;
 }
 
-try {
-    main();
-} catch (Exception $e) {
-    var_dump($e);
-    //Show::error("Unhandled Exception. Message: " . $e->getMessage());
-}
+main();

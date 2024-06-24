@@ -1,5 +1,6 @@
 @import url(weekday-marker.scss);
 @import url(tables.scss);
+@import url(highlight.scss);
 
 .list-container {
   border: 1px solid gray;
@@ -17,4 +18,5 @@
 .content {
   background-color: rgba(0, 0, 0, 13%);
   white-space: pre-wrap;
+  overflow-x: auto
 }

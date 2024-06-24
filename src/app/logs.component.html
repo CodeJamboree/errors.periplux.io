@@ -1,3 +1,14 @@
+<div class="top-controls">
+  <form>
+    <mat-form-field appearance="fill" class="search-form">
+      <mat-label>Search</mat-label>
+      <input matInput mat-form-field data-1p-ignore size="10" id="search" [(ngModel)]="searchInput" name="search">
+    </mat-form-field>
+    <button color="primary" mat-raised-button type="submit" (click)="search()">Search</button>
+  </form>
+  <mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" [length]="totalItems"
+    [pageIndex]="pageIndex" (page)="handlePageEvent($event)"></mat-paginator>
+</div>
 <table class="striped">
   <thead>
     <tr>
@@ -24,11 +35,23 @@
       <td title="{{item.type}}">{{errorTypeAsEmoji(item.type)}}</td>
       <td><img src="{{ generateMatrixImage(item.message_hash)}}"></td>
       <td title=" {{item.message}}">
-        <div class="message">{{item.message}}</div>
+        <div class="message" *ngIf="searchText">
+          <span *ngFor="let part of searchParts(item.message)">
+            <span class="{{part.className}}">{{part.text}}</span>
+          </span>
+        </div>
+        <div class="message" *ngIf="!searchText">{{item.message}}</div>
       </td>
       <td><img src="{{ generateMatrixImage(item.path_hash)}}"></td>
       <td title="{{item.path}}">
-        <div class="path" attr.data-file="{{parseFile(item.path)}}">&lrm;{{item.path}}</div>
+        <div class="path" *ngIf="searchText">
+          <span *ngFor="let part of searchParts(item.path)">
+            <span class="{{part.className}}">&lrm;{{part.text}}</span>
+          </span>
+        </div>
+        <div class="path" *ngIf="!searchText" attr.data-file="{{parseFile(item.path)}}">
+          &lrm;{{item.path}}
+        </div>
       </td>
       <td class="number">{{item.line >= 0 ? item.line : '' | number}}</td>
       <td class="number">{{item.count | number}}</td>
