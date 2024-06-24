@@ -30,7 +30,7 @@
       <td title="{{item.path}}">
         <div class="path" attr.data-file="{{parseFile(item.path)}}">&lrm;{{item.path}}</div>
       </td>
-      <td class="number">{{item.line | number}}</td>
+      <td class="number">{{item.line >= 0 ? item.line : '' | number}}</td>
       <td class="number">{{item.count | number}}</td>
     </tr>
   </tbody>
