@@ -15,6 +15,8 @@ import { generateMatrixImage } from './utils/generateMatrixImage';
 import { errorTypeAsEmoji } from './utils/errorTypeAsEmoji';
 import { highlightSearchTerms } from '../search/highlightSearchTerms';
 import { LogComponentData } from '../log/LogComponentData';
+import { CredentialsComponent } from '../credentials/credentials.component';
+import { CredentialsData } from '../credentials/CredentialsData';
 
 const defaultPageSize = 25;
 
@@ -186,6 +188,23 @@ export class LogsComponent implements OnInit {
     const i = path.lastIndexOf('/');
     if (i === -1) return '';
     return path.substring(i + 1);
+  }
+  editCredentials() {
+    const config = new MatDialogConfig<CredentialsData>();
+    config.data = { username: "foo", password: "foo", secrect: "foo", otp: "foo" };
+    config.disableClose = false;
+    config.hasBackdrop = true;
+    config.minWidth = "50%";
+    config.maxWidth = "90%";
+    config.width = "1000px";
+    config.minHeight = "50%";
+    config.maxHeight = "90%";
+    config.height = "1000px";
+
+    const dialogRef = this.dialog.open<CredentialsComponent, CredentialsData, CredentialsData>(CredentialsComponent, config);
+    dialogRef.afterClosed().subscribe(data => {
+      // foo
+    });
   }
 }
 

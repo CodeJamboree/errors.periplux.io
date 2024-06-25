@@ -1,4 +1,5 @@
 <?php
+require_once "ErrorHandling.php";
 require_once 'HTTP_STATUS.php';
 
 class Show

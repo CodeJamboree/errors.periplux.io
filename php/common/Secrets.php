@@ -919,8 +919,9 @@ final class Secrets
             self::haltExecution("Failed to store in database");
             return false;
         }
+
         if ($scope !== self::scope()) {
-            return;
+            return true;
         }
 
         if ($value === '') {
@@ -930,6 +931,6 @@ final class Secrets
             self::$decryptedCache[$name] = $value;
             self::set_cache($name, $value);
         }
-
+        return true;
     }
 }

@@ -6,8 +6,7 @@
     </mat-form-field>
     <button color="primary" mat-raised-button type="submit" (click)="search()">Search</button>
   </form>
-  <mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" [length]="totalItems"
-    [pageIndex]="pageIndex" (page)="handlePageEvent($event)"></mat-paginator>
+  <button color="secondary" mat-stroked-button (click)="editCredentials()">Credentials</button>
 </div>
 <table class="striped">
   <thead>
