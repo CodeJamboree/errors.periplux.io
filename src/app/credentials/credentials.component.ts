@@ -1,7 +1,4 @@
-import {
-  Component,
-  Inject
-} from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { MatDialogModule } from "@angular/material/dialog";
@@ -11,12 +8,13 @@ import { MatTableModule } from "@angular/material/table";
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, FormGroup, FormControl, Validators, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
-import { ProgressSpinnerMode, MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { CredentialsData } from './CredentialsData';
 import { CredentialsService } from './credentials.service';
+import { alphaNumericOnlyValidator, digitRequiredValidator, lowercaseRequiredValidator, symbolRequiredValidator, uppercaseRequiredValidator } from './validators';
 
 @Component({
   selector: 'app-credentials',
@@ -33,34 +31,65 @@ import { CredentialsService } from './credentials.service';
     FormsModule,
     MatSlideToggleModule,
     MatCardModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ReactiveFormsModule
   ],
   standalone: true
 })
 export class CredentialsComponent {
+  credentialsForm: FormGroup;
   original: CredentialsData;
-  draft: CredentialsData;
   tfaEnabled: boolean = false;
   savingCredentials: boolean = false;
+  savingCredentialsError?: string
 
   constructor(
     private credentialsService: CredentialsService,
     @Inject(MAT_DIALOG_DATA) public data: CredentialsData,
     public dialog: MatDialog,
-    private dialogRef: MatDialogRef<CredentialsData, CredentialsData>
+    private dialogRef: MatDialogRef<CredentialsData, CredentialsData>,
+    private fb: FormBuilder
   ) {
     this.original = data;
-    this.draft = { ...data };
-    this.tfaEnabled = this.draft.secrect !== '';
+    this.tfaEnabled = data.secrect !== '';
+    this.credentialsForm = this.fb.group({
+      username: new FormControl(data.username, [
+        Validators.required,
+        Validators.minLength(3),
+        alphaNumericOnlyValidator
+      ]),
+      password: new FormControl(data.password, [
+        Validators.required,
+        Validators.minLength(8),
+        lowercaseRequiredValidator,
+        uppercaseRequiredValidator,
+        digitRequiredValidator,
+        symbolRequiredValidator
+      ])
+    });
   }
   saveCredentials() {
+    if (!this.credentialsForm.valid) return;
     this.savingCredentials = true;
-    const { username = '', password = '' } = this.draft;
-    this.credentialsService.saveCredentials(username, password)
-      .subscribe(() => {
-        this.original.username = username;
-        this.original.password = password;
-        this.savingCredentials = false;
+    this.savingCredentialsError = undefined;
+    const {
+      username,
+      password
+    } = this.credentialsForm.value;
+    this.credentialsService.saveCredentials(
+      username,
+      password
+    )
+      .subscribe({
+        next: () => {
+          this.original.username = username;
+          this.original.password = password;
+        }, error: (error: Error) => {
+          this.savingCredentialsError = error.message;
+          this.savingCredentials = false;
+        }, complete: () => {
+          this.savingCredentials = false;
+        }
       });
   }
   save() {
