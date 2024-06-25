@@ -2,6 +2,6 @@
 export interface CredentialsData {
   username?: string,
   password?: string,
-  secrect?: string,
+  secret?: string,
   otp?: string
 };

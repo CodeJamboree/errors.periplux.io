@@ -1,3 +1,18 @@
 @use '@angular/material' as mat;
 @import '@angular/material/core/theming/theming';
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+.mat-mdc-snack-bar-container {
+
+  &.error {
+    .mat-mdc-snackbar-surface {
+      background-color: rgb(102, 15, 15);
+    }
+  }
+
+  &.success {
+    .mat-mdc-snackbar-surface {
+      background-color: rgb(12, 116, 40);
+    }
+  }
+}

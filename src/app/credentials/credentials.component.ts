@@ -11,11 +11,21 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, FormGroup, FormControl, Validators, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+
+import { QrCodeModule } from 'ng-qrcode';
 
 import { CredentialsData } from './CredentialsData';
 import { CredentialsService } from './credentials.service';
-import { alphaNumericOnlyValidator, digitRequiredValidator, lowercaseRequiredValidator, symbolRequiredValidator, uppercaseRequiredValidator } from './validators';
-
+import {
+  alphaNumericOnlyValidator,
+  digitRequiredValidator,
+  lowercaseRequiredValidator,
+  symbolRequiredValidator,
+  uppercaseRequiredValidator,
+  conditionallyRequredValidator
+} from './validators';
+import { TwoFactorAuth } from './TwoFactorAuth';
 @Component({
   selector: 'app-credentials',
   templateUrl: './credentials.component.html',
@@ -32,26 +42,36 @@ import { alphaNumericOnlyValidator, digitRequiredValidator, lowercaseRequiredVal
     MatSlideToggleModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    QrCodeModule,
+    MatSnackBarModule
   ],
   standalone: true
 })
 export class CredentialsComponent {
   credentialsForm: FormGroup;
+  tfaForm: FormGroup;
   original: CredentialsData;
-  tfaEnabled: boolean = false;
   savingCredentials: boolean = false;
-  savingCredentialsError?: string
+  savingTfa: boolean = false;
+  newSecret: string = '';
+  provisionUrl: string = '';
 
   constructor(
     private credentialsService: CredentialsService,
+    @Inject(MatSnackBar) private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: CredentialsData,
     public dialog: MatDialog,
     private dialogRef: MatDialogRef<CredentialsData, CredentialsData>,
     private fb: FormBuilder
   ) {
     this.original = data;
-    this.tfaEnabled = data.secrect !== '';
+    this.newSecret = TwoFactorAuth.generate_secret();
+    const tfa = new TwoFactorAuth(this.newSecret);
+    let issuer = document.title;
+    const account = data.username;
+    this.provisionUrl = tfa.generate_provisioning_uri({ account, issuer });
+
     this.credentialsForm = this.fb.group({
       username: new FormControl(data.username, [
         Validators.required,
@@ -67,11 +87,54 @@ export class CredentialsComponent {
         symbolRequiredValidator
       ])
     });
+    this.tfaForm = this.fb.group({
+      otp: new FormControl<string>({
+        value: '',
+        disabled: false
+      }, [
+        Validators.minLength(6),
+        Validators.maxLength(6),
+        Validators.pattern(/^\d+$/),
+        conditionallyRequredValidator(() => {
+          if (!this.tfaForm) return false;
+          return Boolean(this.tfaForm.get('enabled')?.value)
+        }),
+      ]),
+      enabled: new FormControl<boolean>({
+        value: true,
+        disabled: false
+      })
+    });
+
+  }
+  changeTfaEnabled() {
+    const enabled = Boolean(this.tfaForm.get('enabled')?.value);
+    if (enabled) {
+      this.tfaForm.get('otp')?.enable();
+    } else {
+      this.tfaForm.get('otp')?.disable();
+    }
+  }
+  showError(message: string) {
+    this.snackBar.open(message, 'Dismiss', {
+      duration: 222000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: 'error'
+    });
+  }
+  showSuccess(message: string) {
+    this.snackBar.open(message, 'Dismiss', {
+      duration: 222000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: 'success'
+    });
+
   }
   saveCredentials() {
     if (!this.credentialsForm.valid) return;
     this.savingCredentials = true;
-    this.savingCredentialsError = undefined;
     const {
       username,
       password
@@ -81,19 +144,53 @@ export class CredentialsComponent {
       password
     )
       .subscribe({
-        next: () => {
+        next: result => {
+          this.showSuccess(result.message);
           this.original.username = username;
           this.original.password = password;
         }, error: (error: Error) => {
-          this.savingCredentialsError = error.message;
+          this.showError(error.message);
           this.savingCredentials = false;
         }, complete: () => {
           this.savingCredentials = false;
         }
       });
   }
-  save() {
-    this.dialogRef.close(this.original);
+  async saveTwoFactorAuth() {
+    if (!this.tfaForm.valid) return;
+    this.savingTfa = true;
+    const {
+      otp,
+      enabled
+    } = this.tfaForm.value;
+    let secret = '';
+    if (enabled) {
+      secret = this.newSecret;
+      const tfa = new TwoFactorAuth(secret)
+      let expectedOta = await tfa.otp();
+      if (expectedOta !== otp) {
+        expectedOta = await tfa.get_relative_otp(-1);
+      }
+      if (expectedOta !== otp) {
+        expectedOta = await tfa.get_relative_otp(1);
+      }
+      if (expectedOta !== otp) {
+        this.showError('Incorrect OTP provided.');
+        this.savingTfa = false;
+        return;
+      }
+    }
+    this.credentialsService.saveTwoFactorAuth(secret, otp)
+      .subscribe({
+        next: (result) => {
+          this.showSuccess(result.message);
+        }, error: (error: Error) => {
+          this.showError(error.message);
+          this.savingTfa = false;
+        }, complete: () => {
+          this.savingTfa = false;
+        }
+      });
   }
   close() {
     this.dialogRef.close(this.original);

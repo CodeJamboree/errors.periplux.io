@@ -44,7 +44,7 @@ function main()
     $result = Secrets::keep("CREDENTIALS", $json);
 
     if ($result === true) {
-        Show::message("Success");
+        Show::message("Login credentials updated");
     } else {
         Show::error("Unable to save credentials");
     }

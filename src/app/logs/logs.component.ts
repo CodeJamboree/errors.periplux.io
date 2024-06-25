@@ -189,9 +189,9 @@ export class LogsComponent implements OnInit {
     if (i === -1) return '';
     return path.substring(i + 1);
   }
-  editCredentials() {
+  editSettings() {
     const config = new MatDialogConfig<CredentialsData>();
-    config.data = { username: "foo", password: "foo", secrect: "foo", otp: "foo" };
+    config.data = { username: "foo" };
     config.disableClose = false;
     config.hasBackdrop = true;
     config.minWidth = "50%";

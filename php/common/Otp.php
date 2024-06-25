@@ -217,7 +217,7 @@ class Otp
     private function generate_otp(int $input)
     {
         $data = pack('J*', $input);
-        $key = $this->base32_decode($this->secret);
+        $key = self::base32_decode($this->secret);
         $hash = hash_hmac($this->algorithm, $data, $key, true);
         $offset = ord(substr($hash, -1)) & 0xF;
         $value = unpack('N', substr($hash, $offset, 4))[1] & 0x7FFFFFFF;
@@ -288,7 +288,7 @@ class Otp
                 }
                 break;
             case 'hotp':
-                if ($count === null) {
+                if ($counter === null) {
                     throw new Exception('Initial counter is required for HOTP.');
                 }
 
