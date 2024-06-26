@@ -6,12 +6,20 @@ import { AuthenticationStatus } from './AuthenticationStatus';
 })
 export class AuthService {
   status?: AuthenticationStatus;
-
-  isLoggedIn() {
-    return this.status?.authenticated ?? false;
+  constructor() {
+    const json = localStorage.getItem('authentication');
+    if (json === null) return;
+    try {
+      this.status = JSON.parse(json);
+    } catch (e) {
+    }
   }
   setStatus(status: AuthenticationStatus) {
     this.status = status;
+    localStorage.setItem('authentication', JSON.stringify(status));
+  }
+  isLoggedIn() {
+    return this.status?.authenticated ?? false;
   }
   canBypass2FA(): boolean {
     if (this.status === undefined) return false;
