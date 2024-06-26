@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { LogsComponent } from './app/logs/logs.component';
+import { LogsGridComponent } from './app/logsGrid/logsGrid.component';
 import { LoginComponent } from './app/login/login.component';
 
 export const routes: Routes = [
-  { path: '', component: LogsComponent, pathMatch: 'full' },
+  { path: '', component: LogsGridComponent, pathMatch: 'full' },
   { path: 'login', component: LoginComponent }
 ];

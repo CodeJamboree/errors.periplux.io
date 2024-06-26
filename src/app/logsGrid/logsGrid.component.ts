@@ -8,7 +8,7 @@ import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/p
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { LogsService } from './logs.service';
+import { LogsService } from './logsGrid.service';
 import { LogComponent } from '../log/log.component';
 import { LogData } from './LogData';
 import { generateMatrixImage } from './utils/generateMatrixImage';
@@ -21,9 +21,9 @@ import { CredentialsData } from '../credentials/CredentialsData';
 const defaultPageSize = 25;
 
 @Component({
-  selector: 'app-logs',
-  templateUrl: './logs.component.html',
-  styleUrls: ['./logs.component.scss'],
+  selector: 'logs-grid',
+  templateUrl: './logsGrid.component.html',
+  styleUrls: ['./logsGrid.component.scss'],
   imports: [
     MatPaginatorModule,
     NgFor,
@@ -37,7 +37,7 @@ const defaultPageSize = 25;
   ],
   standalone: true
 })
-export class LogsComponent implements OnInit {
+export class LogsGridComponent implements OnInit {
   @ViewChild('paginator') paginator!: MatPaginator
   pageSizeOptions = [5, 10, 25, 50, 100];
   totalItems: number = 0;
