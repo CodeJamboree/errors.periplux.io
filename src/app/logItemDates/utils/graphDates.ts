@@ -1,11 +1,11 @@
-import { LogDateData } from "../LogDateData";
+import { LogItemDateData } from "../LogItemDateData";
 
-const minDateReducer = (min: number, { first_at }: LogDateData) => Math.min(first_at, min);
-const maxDateReducer = (max: number, { last_at }: LogDateData) => Math.max(last_at, max);
-const minCountReducer = (min: number, { count }: LogDateData) => Math.min(count, min);
-const maxCountReducer = (max: number, { count }: LogDateData) => Math.max(count, max);
+const minDateReducer = (min: number, { first_at }: LogItemDateData) => Math.min(first_at, min);
+const maxDateReducer = (max: number, { last_at }: LogItemDateData) => Math.max(last_at, max);
+const minCountReducer = (min: number, { count }: LogItemDateData) => Math.min(count, min);
+const maxCountReducer = (max: number, { count }: LogItemDateData) => Math.max(count, max);
 
-export const graphDates = (data: LogDateData[]) => {
+export const graphDates = (data: LogItemDateData[]) => {
   if (data.length < 3) return "";
 
   const first = data[0];

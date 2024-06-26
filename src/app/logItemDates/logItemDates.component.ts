@@ -1,39 +1,46 @@
 /* eslint-disable no-console */
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { NgFor, CommonModule } from '@angular/common';
-import { LogDetailsService } from './logDetails.service';
-import { LogDetailData } from './LogDetailData';
+import { LogItemDatesService } from './logItemDates.service';
+import { LogItemDateData } from './LogItemDateData';
+import { DurationPipe } from '../pipes/DurationPipe';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
-import { highlightSearchTerms } from '../search/highlightSearchTerms';
+import { graphDates } from './utils/graphDates';
 
 @Component({
-  selector: 'app-log-details',
-  templateUrl: './logDetails.component.html',
-  styleUrls: ['./logDetails.component.scss'],
-  imports: [MatPaginatorModule, NgFor, CommonModule],
+  selector: 'log-item-dates',
+  templateUrl: './logItemDates.component.html',
+  styleUrls: ['./logItemDates.component.scss'],
+  imports: [
+    MatPaginatorModule,
+    NgFor,
+    CommonModule,
+    DurationPipe
+  ],
   standalone: true
 })
-export class LogDetailsComponent implements OnInit {
+export class LogItemDatesComponent implements OnInit {
   @Input() id!: string;
-  @Input() search!: string;
   @ViewChild('paginator') paginator!: MatPaginator
   pageSizeOptions = [5, 10, 25, 50, 100];
   totalItems: number = 0;
   pageSize: number = 10;
   pageIndex: number = 0;
-  data: LogDetailData[] = [];
+  data: LogItemDateData[] = [];
+  graphDates = graphDates;
 
-  constructor(private logDetailsService: LogDetailsService) {
+  constructor(private logItemDatesService: LogItemDatesService) {
   }
-  hasData() {
-    return this.totalItems !== 0;
-  }
+
   ngOnInit() {
     this.loadData(this.pageIndex, this.pageSize);
   }
+  showPagnator() {
+    return (this.totalItems / this.pageSize) > 1;
+  }
 
   loadData(pageIndex: number, pageSize: number) {
-    this.logDetailsService.getPage(this.id, pageIndex + 1, pageSize)
+    this.logItemDatesService.getPage(this.id, pageIndex + 1, pageSize)
       .subscribe(response => {
         this.pageSize = pageSize;
         this.pageIndex = pageIndex;
@@ -43,11 +50,5 @@ export class LogDetailsComponent implements OnInit {
   }
   handlePageEvent(event: PageEvent) {
     this.loadData(event.pageIndex, event.pageSize);
-  }
-  showPagnator() {
-    return (this.totalItems / this.pageSize) > 1;
-  }
-  searchParts(text: string) {
-    return highlightSearchTerms(text, this.search);
   }
 }

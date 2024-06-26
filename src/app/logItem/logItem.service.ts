@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class LogService {
+export class LogItemService {
   private openDialog = new Subject<boolean>();
   isOpen$ = this.openDialog.asObservable();
 

@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { LogDateData } from './LogDateData';
+import { LogItemDetailData } from './LogItemDetailData';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { PaginatedResponse } from '../types/PaginatedData';
 
 @Injectable({
   providedIn: 'root'
 })
-export class LogDatesService {
-  baseUrl = `${environment.api}/dates`;
+export class LogItemDetailsService {
+  baseUrl = `${environment.api}/details`;
 
   constructor(private http: HttpClient) { }
 
@@ -17,6 +18,12 @@ export class LogDatesService {
       .set('log_id', logId)
       .set('page', pageNumber.toString())
       .set('size', pageSize.toString());
-    return this.http.get<PaginatedResponse<LogDateData>>(this.baseUrl, { params });
+    return this.http.get<PaginatedResponse<LogItemDetailData>>(this.baseUrl, { params }).pipe(
+      map(data => {
+        data.data.forEach(async (item, i) => {
+          item.details = environment.censor(item.details);
+        })
+        return data;
+      }));
   }
 }

@@ -8,28 +8,28 @@ import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/p
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { LogsService } from './logsGrid.service';
-import { LogItemComponent } from '../logItem/logItem.component';
+import { LogsService } from './logs.service';
+import { LogComponent } from '../logItem/logItem.component';
 import { LogData } from './LogData';
 import { generateMatrixImage } from './utils/generateMatrixImage';
 import { errorTypeAsEmoji } from './utils/errorTypeAsEmoji';
 import { highlightSearchTerms } from '../search/highlightSearchTerms';
-import { LogItemComponentData } from '../logItem/LogItemComponentData';
+import { LogComponentData } from '../logItem/LogItemComponentData';
 import { CredentialsComponent } from '../credentials/credentials.component';
 import { CredentialsData } from '../credentials/CredentialsData';
 
 const defaultPageSize = 25;
 
 @Component({
-  selector: 'logs-grid',
-  templateUrl: './logsGrid.component.html',
-  styleUrls: ['./logsGrid.component.scss'],
+  selector: 'app-logs',
+  templateUrl: './logs.component.html',
+  styleUrls: ['./logs.component.scss'],
   imports: [
     MatPaginatorModule,
     NgFor,
     CommonModule,
     MatDialogModule,
-    LogItemComponent,
+    LogComponent,
     MatButtonModule,
     FormsModule,
     MatFormFieldModule,
@@ -37,7 +37,7 @@ const defaultPageSize = 25;
   ],
   standalone: true
 })
-export class LogsGridComponent implements OnInit {
+export class LogsComponent implements OnInit {
   @ViewChild('paginator') paginator!: MatPaginator
   pageSizeOptions = [5, 10, 25, 50, 100];
   totalItems: number = 0;
@@ -154,7 +154,7 @@ export class LogsGridComponent implements OnInit {
   onRowClick(item: LogData) {
     if (this.isDialogOpen) return;
     this.isDialogOpen = true;
-    const config = new MatDialogConfig<LogItemComponentData>();
+    const config = new MatDialogConfig<LogComponentData>();
     config.data = { item, search: this.searchText };
     config.disableClose = false;
     config.hasBackdrop = true;
@@ -168,7 +168,7 @@ export class LogsGridComponent implements OnInit {
 
     this.selectedId = item.id;
     this.updateQueryPrams();
-    const dialogRef = this.dialog.open<LogItemComponent, LogItemComponentData>(LogItemComponent, config);
+    const dialogRef = this.dialog.open<LogComponent, LogComponentData>(LogComponent, config);
     dialogRef.componentInstance.nextItemEvent.subscribe(event => {
       event.setLog(this.getNext(event.id, 1));
     });

@@ -23,7 +23,10 @@ export const lowercaseRequiredValidator = (value: string | FormControlState<stri
 export const symbolRequiredValidator = (value: string | FormControlState<string>) => {
   return validate(value, /[-[!@#$%^&*()_+={}|:";'<>?,.\/\\\]]/, 'symbolRequired');
 }
-export const conditionallyRequredValidator = (condition: () => boolean, key: string = 'required') => (value: string | FormControlState<string>) => {
+export const conditionallyRequredValidator = (
+  condition: () => boolean,
+  key: string = 'required'
+) => (value: string | FormControlState<string>) => {
   if (!condition()) return null;
   const text = valueOf(value);
   if (text !== '') return null;
