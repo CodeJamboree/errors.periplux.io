@@ -1,0 +1,19 @@
+<form [formGroup]="tfaForm" (ngSubmit)="verify()">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Two-Factor Authentication</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field appearance="fill">
+        <mat-label>One-Time Password</mat-label>
+        <input matInput mat-form-field size="10" formControlName="otp">
+      </mat-form-field>
+      <mat-card-actions>
+        <button [disabled]="waiting || !tfaForm.valid" color="primary" mat-flat-button type="submit">
+          Verify
+        </button>
+        <mat-progress-spinner *ngIf="waiting" mode="indeterminate" diameter="32"></mat-progress-spinner>
+      </mat-card-actions>
+    </mat-card-content>
+  </mat-card>
+</form>

@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ItemResponse } from '../types/ItemResponse';
 import { MessageResponse } from '../types/MessageResponse';
 
 @Injectable({
@@ -16,7 +15,7 @@ export class CredentialsService {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     };
-    return this.http.post<MessageResponse>(`${environment.api}/change-credentials`, data, httpOptions).pipe(
+    return this.http.post<MessageResponse>(`${environment.api}/login-change`, data, httpOptions).pipe(
       catchError((response: HttpErrorResponse) => {
         try {
           const error = response.error.error;
@@ -32,7 +31,7 @@ export class CredentialsService {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     };
-    return this.http.post<MessageResponse>(`${environment.api}/change-2fa`, data, httpOptions).pipe(
+    return this.http.post<MessageResponse>(`${environment.api}/tfa-change`, data, httpOptions).pipe(
       catchError((response: HttpErrorResponse) => {
         try {
           const error = response.error.error;
