@@ -7,17 +7,16 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { LogData } from '../logList/LogData';
+import { LogDatesComponent } from '../logItemDates/logItemDates.component';
+import { LogDetailsComponent } from '../logItemDetails/logItemDetails.component';
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
 import { MatTableModule } from "@angular/material/table";
-import { CommonModule } from '@angular/common';
-
-import { LogData } from '../logList/LogData';
-import { LogItemDatesComponent } from '../logItemDates/logItemDates.component';
-import { LogItemDetailsComponent } from '../logItemDetails/logItemDetails.component';
 import { generateMatrixImage } from '../logList/utils/generateMatrixImage';
+import { CommonModule } from '@angular/common';
 import { errorTypeAsEmoji } from '../logList/utils/errorTypeAsEmoji';
 import { errorNumberAsType } from '../logList/utils/errorNumberAsType';
 import { DurationPipe } from '../pipes/DurationPipe';
@@ -30,12 +29,12 @@ interface NextLogEvent {
 };
 
 @Component({
-  selector: 'log-item',
-  templateUrl: './logItem.component.html',
-  styleUrls: ['./logItem.component.scss'],
+  selector: 'app-log',
+  templateUrl: './log.component.html',
+  styleUrls: ['./log.component.scss'],
   imports: [
-    LogItemDetailsComponent,
-    LogItemDatesComponent,
+    LogDetailsComponent,
+    LogDatesComponent,
     AgePipe,
     DurationPipe,
     CommonModule,
@@ -47,7 +46,7 @@ interface NextLogEvent {
   ],
   standalone: true
 })
-export class LogItemComponent implements OnInit, OnDestroy {
+export class LogComponent implements OnInit, OnDestroy {
   item: LogData
   searchText: string = '';
   nextItemEvent = new EventEmitter<NextLogEvent>();
@@ -62,7 +61,7 @@ export class LogItemComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: { item: LogData, search: string },
     @Inject(DOCUMENT) private document: Document,
     public dialog: MatDialog,
-    private dialogRef: MatDialogRef<LogItemComponent>
+    private dialogRef: MatDialogRef<LogComponent>
   ) {
     this.item = data.item;
     this.searchText = data.search;

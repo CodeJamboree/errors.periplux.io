@@ -11,7 +11,7 @@ import { sqlLike } from '../search/sqlLike';
 @Injectable({
   providedIn: 'root'
 })
-export class LogsService {
+export class LogListService {
   baseUrl = `${environment.api}/logs`;
 
   constructor(private http: HttpClient) { }

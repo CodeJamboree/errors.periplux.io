@@ -1,4 +1,4 @@
-import { LogData } from "../logsGrid/LogData";
+import { LogData } from "../logList/LogData";
 
 export interface LogItemComponentData {
   item: LogData;

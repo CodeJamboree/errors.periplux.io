@@ -8,7 +8,7 @@ import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/p
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { LogsService } from './logsGrid.service';
+import { LogListService } from './logList.service';
 import { LogItemComponent } from '../logItem/logItem.component';
 import { LogData } from './LogData';
 import { generateMatrixImage } from './utils/generateMatrixImage';
@@ -22,8 +22,8 @@ const defaultPageSize = 25;
 
 @Component({
   selector: 'logs-grid',
-  templateUrl: './logsGrid.component.html',
-  styleUrls: ['./logsGrid.component.scss'],
+  templateUrl: './logList.component.html',
+  styleUrls: ['./logList.component.scss'],
   imports: [
     MatPaginatorModule,
     NgFor,
@@ -37,7 +37,7 @@ const defaultPageSize = 25;
   ],
   standalone: true
 })
-export class LogsGridComponent implements OnInit {
+export class LogListComponent implements OnInit {
   @ViewChild('paginator') paginator!: MatPaginator
   pageSizeOptions = [5, 10, 25, 50, 100];
   totalItems: number = 0;
@@ -52,7 +52,7 @@ export class LogsGridComponent implements OnInit {
   generateMatrixImage = generateMatrixImage;
 
   constructor(
-    private logsService: LogsService,
+    private logListService: LogListService,
     public dialog: MatDialog,
     private activatedRoute: ActivatedRoute,
     private router: Router
@@ -107,7 +107,7 @@ export class LogsGridComponent implements OnInit {
     if (pageIndex === this.pageIndex && pageSize === this.pageSize && search === this.searchText) {
       return;
     }
-    this.logsService.getPage(pageIndex + 1, pageSize, search)
+    this.logListService.getPage(pageIndex + 1, pageSize, search)
       .subscribe(response => {
         this.pageSize = pageSize;
         this.pageIndex = pageIndex;
@@ -130,7 +130,7 @@ export class LogsGridComponent implements OnInit {
       this.onRowClick(selected);
       return;
     }
-    this.logsService.getItem(this.selectedId)
+    this.logListService.getItem(this.selectedId)
       .subscribe(item => {
         this.onRowClick(item);
       })
