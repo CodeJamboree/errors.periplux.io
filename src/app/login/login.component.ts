@@ -87,7 +87,7 @@ export class LoginComponent implements OnInit {
     this.loginService.login(username, password)
       .subscribe({
         next: result => {
-          this.auth.setIsLoggedIn(true);
+          this.auth.setStatus(result);
         }, error: (error: Error) => {
           this.notice.error(error.message);
           this.waiting = false;

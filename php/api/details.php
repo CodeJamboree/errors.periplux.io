@@ -1,4 +1,5 @@
 <?php
+require_once "../common/access_control.php";
 require_once "../common/Show.php";
 require_once "../common/DatabaseHelper.php";
 require_once "../common/Secrets.php";

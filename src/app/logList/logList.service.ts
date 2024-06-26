@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LogData } from './LogData';
 import { environment } from '../../environments/environment';
 import { PaginatedResponse } from '../types/PaginatedData';
 import { ItemResponse } from '../types/ItemResponse';
-import { sqlLike } from '../search/sqlLike';
+import { Api } from '../../Api';
 
 @Injectable({
   providedIn: 'root'
@@ -14,41 +13,31 @@ import { sqlLike } from '../search/sqlLike';
 export class LogListService {
   baseUrl = `${environment.api}/logs`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private api: Api) { }
 
   getItem(id: number): Observable<LogData> {
-    let params = new HttpParams()
-      .set('id', id.toString());
-    return this.http.get<ItemResponse<LogData>>(`${environment.api}/log`, { params })
+    return this.api.get<ItemResponse<LogData>>('log', { id })
       .pipe(
-        map(data => {
-          const items = [data.data];
-          items.forEach(async item => {
-            item.path = environment.censor(item.path);
-            item.message = environment.censor(item.message);
-            item.message_hash = await this.hash(item.message);
-            item.scope_hash = await this.hash(item.scope);
-            item.path_hash = await this.hash(item.path);
-          })
-          return items[0];
-        }));
+        map(data =>
+          this.transform([data.data])[0]
+        ));
+  }
+  transform(items: LogData[]) {
+    items.forEach(async item => {
+      item.path = environment.censor(item.path);
+      item.message = environment.censor(item.message);
+      item.message_hash = await this.hash(item.message);
+      item.scope_hash = await this.hash(item.scope);
+      item.path_hash = await this.hash(item.path);
+    });
+    return items;
   }
 
-  getPage(pageNumber: number, pageSize: number, search: string): Observable<PaginatedResponse<LogData>> {
-    let params = new HttpParams()
-      .set('page', pageNumber.toString())
-      .set('size', pageSize.toString())
-      .set('search', sqlLike(search));
-    return this.http.get<PaginatedResponse<LogData>>(this.baseUrl, { params })
+  getPage(page: number, size: number, search: string) {
+    return this.api.get<PaginatedResponse<LogData>>('logs', { page, size, search })
       .pipe(
         map(data => {
-          data.data.forEach(async (item, i) => {
-            item.path = environment.censor(item.path);
-            item.message = environment.censor(item.message);
-            item.message_hash = await this.hash(item.message);
-            item.scope_hash = await this.hash(item.scope);
-            item.path_hash = await this.hash(item.path);
-          })
+          this.transform(data.data);
           return data;
         }));
   }

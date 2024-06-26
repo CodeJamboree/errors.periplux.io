@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { LogItemDateData } from './LogItemDateData';
 import { environment } from '../../environments/environment';
 import { PaginatedResponse } from '../types/PaginatedData';
+import { Api } from '../../Api';
 
 @Injectable({
   providedIn: 'root'
@@ -10,13 +10,13 @@ import { PaginatedResponse } from '../types/PaginatedData';
 export class LogItemDatesService {
   baseUrl = `${environment.api}/dates`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private api: Api) { }
 
   getPage(logId: string, pageNumber: number, pageSize: number) {
-    let params = new HttpParams()
-      .set('log_id', logId)
-      .set('page', pageNumber.toString())
-      .set('size', pageSize.toString());
-    return this.http.get<PaginatedResponse<LogItemDateData>>(this.baseUrl, { params });
+    return this.api.get<PaginatedResponse<LogItemDateData>>('dates', {
+      log_id: logId,
+      page: pageNumber,
+      size: pageSize
+    });
   }
 }

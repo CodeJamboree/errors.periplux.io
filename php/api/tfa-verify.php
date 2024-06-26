@@ -1,4 +1,5 @@
 <?php
+require_once "../common/session.php";
 require_once "../common/Show.php";
 require_once "../common/Secrets.php";
 require_once "../common/PostedJson.php";
@@ -8,12 +9,24 @@ function main()
 {
     $posted = new PostedJson(2);
 
-    if (!$posted->keysExist('otp')) {
+    if (!$posted->keysExist('token', 'otp')) {
         Show::error($posted->lastError(), $posted->lastErrorCode());
         exit;
     }
 
     $otp = $posted->getValue('otp');
+    $token = $posted->getValue('token');
+
+    $authentication = Secrets::revealAs("AUTHENTICATION", 'array');
+
+    if ($token !== $authentication['token']) {
+        Show::error('Incorrect token');
+        exit;
+    }
+    if ($authentication['otp_required'] !== true) {
+        Show::error('No pending 2FA request');
+        exit;
+    }
 
     if ($otp === '') {
         Show::error("Invalid otp");
@@ -36,7 +49,18 @@ function main()
         return;
     }
 
-    Show::data(['verified' => true]);
+    $token = openssl_random_pseudo_bytes(16);
+    $token_hash = bin2hex($token);
+
+    $data = [
+        'authenticated' => true,
+        'otp_required' => false,
+        'token' => $token_hash,
+    ];
+    $json = json_encode($data, JSON_PRETTY_PRINT);
+
+    Secrets::keep("AUTHENTICATION", $json);
+    Show::data($data);
     exit;
 }
 main();

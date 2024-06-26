@@ -70,16 +70,21 @@ export class TfaComponent implements OnInit {
   }
   async verify() {
     if (!this.tfaForm.valid) return;
+    const token = this.auth.token();
+    if (token === undefined) {
+      this.navigateToReturnUrl();
+      return;
+    }
     this.waiting = true;
     const {
       otp,
     } = this.tfaForm.value;
     this.tfaService.verify(otp)
       .subscribe({
-        next: (result) => {
-          this.auth.setIsTfaAuthenticated(result);
-          this.verified = result;
-          if (!result) {
+        next: (status) => {
+          this.auth.setStatus(status);
+          this.verified = !status.otp_required;
+          if (status.otp_required) {
             this.notice.error("Incorrect OTP provided");
           }
         }, error: (error: Error) => {

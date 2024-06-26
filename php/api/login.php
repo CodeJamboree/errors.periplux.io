@@ -1,4 +1,5 @@
 <?php
+require_once "../common/session.php";
 require_once "../common/Show.php";
 require_once "../common/Secrets.php";
 require_once "../common/PostedJson.php";
@@ -43,7 +44,24 @@ function main()
         exit;
     }
 
-    Show::message('Login successful');
+    $token = openssl_random_pseudo_bytes(16);
+    $token_hash = bin2hex($token);
+
+    $secret = Secrets::reveal("OTP_SECRET");
+    if ($secret === false || $secret === '') {
+        $otp_required = false;
+    } else {
+        $otp_required = true;
+    }
+
+    $data = [
+        'authenticated' => true,
+        'otp_required' => $otp_required,
+        'token' => $token_hash,
+    ];
+    $json = json_encode($data, JSON_PRETTY_PRINT);
+    Secrets::keep("AUTHENTICATION", $json);
+    Show::data($data);
     exit;
 }
 main();

@@ -25,19 +25,17 @@ export class TfaGuard implements CanActivate {
   ) { }
 
   canActivate(
-    route: ActivatedRouteSnapshot,
+    _route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): activateResponse {
-    const requiredObserver = this.authService.canBypass2FA();
-    requiredObserver.subscribe((canActivate: boolean) => {
-      if (canActivate) return;
-      const extras = {
-        queryParams: {
-          returnUrl: state.url
-        }
-      };
-      this.router.navigate(['/tfa'], extras);
-    });
-    return requiredObserver;
+    const canBypass = this.authService.canBypass2FA();
+    if (canBypass) return true;
+    const extras = {
+      queryParams: {
+        returnUrl: state.url
+      }
+    };
+    this.router.navigate(['/tfa'], extras);
+    return false;
   }
 }

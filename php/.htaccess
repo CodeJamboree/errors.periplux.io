@@ -17,7 +17,7 @@ RewriteRule ^(.*)$ options-handler.php [L]
     # Browser already got past CORS OPTIONS
     Header set Access-Control-Allow-Origin "*"
     Header set Access-Control-Allow-Methods "GET, POST"
-    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization, Cookie"
     Header set Access-Control-Allow-Credentials "true"
   </If>
 </IfModule>

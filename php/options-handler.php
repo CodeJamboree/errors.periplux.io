@@ -22,7 +22,7 @@ function allow()
     global $HTTP_ORIGIN;
     // Set CORS headers
     header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-    header("Access-Control-Allow-Headers: Content-Type, Authorization");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, Cookie");
     header('Access-Control-Allow-Credentials: true');
     header("Access-Control-Allow-Origin: $HTTP_ORIGIN");
     http_response_code(HTTP_STATUS_OK);
