@@ -17,6 +17,7 @@ import { highlightSearchTerms } from '../search/highlightSearchTerms';
 import { LogItemComponentData } from '../logItem/LogItemComponentData';
 import { CredentialsComponent } from '../credentials/credentials.component';
 import { CredentialsData } from '../credentials/CredentialsData';
+import { AuthService } from '../../AuthService';
 
 const defaultPageSize = 25;
 
@@ -55,7 +56,8 @@ export class LogListComponent implements OnInit {
     private logListService: LogListService,
     public dialog: MatDialog,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private auth: AuthService
   ) {
   }
 
@@ -198,6 +200,16 @@ export class LogListComponent implements OnInit {
     dialogRef.afterClosed().subscribe(data => {
       // foo
     });
+  }
+  logout() {
+    this.auth.logout();
+    const { pathname, search, hash } = window.location;
+    const extras = {
+      queryParams: {
+        returnUrl: `${pathname}${search}${hash}`
+      }
+    };
+    this.router.navigate(['login'], extras);
   }
 }
 

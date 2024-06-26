@@ -6,7 +6,10 @@
     </mat-form-field>
     <button color="primary" mat-raised-button type="submit" (click)="search()">Search</button>
   </form>
-  <button color="secondary" mat-stroked-button (click)="editSettings()">Settings</button>
+  <div>
+    <button color="secondary" mat-stroked-button (click)="editSettings()">Settings</button>
+    <button color="secondary" mat-stroked-button (click)="logout()">Log Out</button>
+  </div>
 </div>
 <table class="striped">
   <thead>

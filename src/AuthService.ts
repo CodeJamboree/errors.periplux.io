@@ -18,6 +18,10 @@ export class AuthService {
     this.status = status;
     localStorage.setItem('authentication', JSON.stringify(status));
   }
+  logout() {
+    localStorage.removeItem('authentication');
+    this.status = undefined;
+  }
   isLoggedIn() {
     return this.status?.authenticated ?? false;
   }
