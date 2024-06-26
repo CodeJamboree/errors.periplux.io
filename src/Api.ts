@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AuthService } from './AuthService';
 import { environment } from './environments/environment';
@@ -8,33 +8,50 @@ import { environment } from './environments/environment';
   providedIn: 'root'
 })
 export class Api {
-
   constructor(
     private http: HttpClient,
     private auth: AuthService
   ) { }
-
   get<T>(stub: string, data: Record<string, any>): Observable<T> {
-    const params = new URLSearchParams(data);
-    const url = `${stub}?${params}`;
-    return this.post(url, {});
+    let params = new HttpParams();
+    Object.keys(data).forEach(key => {
+      params = params.append(key, data[key]);
+    })
+    const headers: Record<string, string | number> = {};
+    this.applyAuthorization(headers);
+    const httpOptions = {
+      params,
+      headers: new HttpHeaders(headers)
+    };
+    return this.http.get<T>(`${environment.api}/${stub}`, httpOptions).pipe(
+      this.errorHandler()
+    );
+  }
+  applyAuthorization(headers: Record<string, string | number>) {
+    const token = this.auth.token();
+    if (token === undefined) return;
+    headers['Authorization'] = `Bearer ${token}`;
   }
   post<T>(stub: string, data: Record<string, any>): Observable<T> {
-    data['token'] = this.auth.token();
+    const headers: Record<string, string | number> = {
+      'Content-Type': 'application/json'
+    };
+    this.applyAuthorization(headers);
     const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      }),
+      headers: new HttpHeaders(headers)
     };
     return this.http.post<T>(`${environment.api}/${stub}`, data, httpOptions).pipe(
-      catchError((response: HttpErrorResponse) => {
-        try {
-          const error = response.error.error;
-          return throwError(() => new Error(error));
-        } catch (e) {
-          return throwError(() => new Error("Unexpected API response"));
-        }
-      })
+      this.errorHandler()
     );
+  }
+  errorHandler<T>() {
+    return catchError<T, Observable<never>>((response: HttpErrorResponse) => {
+      try {
+        const error = response.error.error;
+        return throwError(() => new Error(error));
+      } catch (e) {
+        return throwError(() => new Error("Unexpected API response"));
+      }
+    })
   }
 }

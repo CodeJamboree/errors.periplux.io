@@ -5,17 +5,11 @@ require_once 'Secrets.php';
 require_once 'Show.php';
 require_once 'HTTP_STATUS.php';
 require_once 'PostedJson.php';
+require_once 'get_token.php';
 
 function main()
 {
-    $posted = new \PostedJson(2);
-
-    if (!$posted->keysExist('token')) {
-        \Show::error($posted->lastError(), $posted->lastErrorCode());
-        exit;
-    }
-
-    $token = $posted->getValue('token');
+    $token = \get_token();
 
     $authentication = \Secrets::revealAs("AUTHENTICATION", 'array');
 

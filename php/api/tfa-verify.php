@@ -4,18 +4,20 @@ require_once "../common/Show.php";
 require_once "../common/Secrets.php";
 require_once "../common/PostedJson.php";
 require_once "../common/Otp.php";
+require_once "../common/get_token.php";
 
 function main()
 {
     $posted = new PostedJson(2);
 
-    if (!$posted->keysExist('token', 'otp')) {
+    if (!$posted->keysExist('otp')) {
         Show::error($posted->lastError(), $posted->lastErrorCode());
         exit;
     }
 
     $otp = $posted->getValue('otp');
-    $token = $posted->getValue('token');
+
+    $token = get_token();
 
     $authentication = Secrets::revealAs("AUTHENTICATION", 'array');
 
