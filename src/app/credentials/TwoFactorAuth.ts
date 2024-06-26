@@ -4,6 +4,8 @@
  * This class provides functionality for generating and validating one-time passwords (OTPs)
  * for two-factor authentication (2FA) using Time-based One-Time Passwords (TOTP) and
  * Counter-based One-Time Passwords (HOTP) algorithms.
+ * 
+ * June 25, 2024: Ported from PHP to TypeScript
  */
 type digits = 6 | 7 | 8;
 type period = 15 | 30 | 60;
@@ -11,26 +13,6 @@ type type = 'totp' | 'hotp';
 type algorithm = 'sha1' | 'sha256' | 'sha512';
 type secret = string;
 type otp = string;
-
-const int64toBytes = (value: number): Uint8Array => {
-  const buffer = new ArrayBuffer(8);
-  const dataView = new DataView(buffer, 0, 8);
-  dataView.setBigInt64(0, BigInt(value), false);
-  return new Uint8Array(buffer);
-}
-
-async function hash_hmac(
-  algorithm: algorithm,
-  message: Uint8Array,
-  secret: Uint8Array
-): Promise<Uint8Array> {
-  const hash = algorithm.replace('sha', 'SHA-');
-  const key = await crypto.subtle.importKey(
-    'raw', secret, { name: 'HMAC', hash }, false, ['sign']
-  );
-  const signature = await crypto.subtle.sign('HMAC', key, message);
-  return new Uint8Array(signature);
-}
 
 export class TwoFactorAuth {
   private static BASE_32_SYMBOLS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
@@ -220,14 +202,47 @@ export class TwoFactorAuth {
    * @throws Exception If the secret contains invalid Base32 characters.
    */
   private async generate_otp(input: number): Promise<otp> {
-    const data = int64toBytes(input);
+    const data = this.int64toBytes(input);
     const key = TwoFactorAuth.base32_decode(this.secret);
-    const hash = await hash_hmac(this.algorithm, data, key);
+    const hash = await this.hash_hmac(this.algorithm, data, key);
     const view = new DataView(hash.buffer);
     const offset = view.getInt8(hash.byteLength - 1) & 0xF;
     const value = view.getInt32(offset, false) & 0x7FFFFFFF;
     const otp = value % 10 ** this.digits;
     return otp.toString().padStart(this.digits, '0');
+  }
+
+  /**
+   * Converts a 64 bit integer to a byte array
+   * @param value 64bit value to convert to byte array
+   * @returns Uint8Array[8] Array of 8 bytes in big endian order
+   */
+  private int64toBytes(value: number): Uint8Array {
+    const buffer = new ArrayBuffer(8);
+    const dataView = new DataView(buffer, 0, 8);
+    dataView.setBigInt64(0, BigInt(value), false);
+    return new Uint8Array(buffer);
+  }
+
+  /**
+   * 
+   * @param algorithm The algorithm used to hash the message
+   * @param message The message to hash
+   * @param secret The secret to apply to the hash
+   * @returns promise of a hashed message
+   */
+  private async hash_hmac(
+    algorithm: algorithm,
+    message: Uint8Array,
+    secret: Uint8Array
+  ): Promise<Uint8Array> {
+    const name = 'HMAC';
+    const hash = algorithm.replace('sha', 'SHA-');
+    const key = await crypto.subtle.importKey(
+      'raw', secret, { name, hash }, false, ['sign']
+    );
+    const signature = await crypto.subtle.sign(name, key, message);
+    return new Uint8Array(signature);
   }
   /**
    * Generate a URI for provisioning a new OTP token.
