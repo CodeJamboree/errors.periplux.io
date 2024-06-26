@@ -17,6 +17,8 @@ import { QrCodeModule } from 'ng-qrcode';
 
 import { CredentialsData } from './CredentialsData';
 import { CredentialsService } from './credentials.service';
+import { Notice } from '../Notice';
+
 import {
   alphaNumericOnlyValidator,
   digitRequiredValidator,
@@ -24,7 +26,7 @@ import {
   symbolRequiredValidator,
   uppercaseRequiredValidator,
   conditionallyRequredValidator
-} from './validators';
+} from '../validators';
 import { TwoFactorAuth } from './TwoFactorAuth';
 @Component({
   selector: 'app-credentials',
@@ -56,6 +58,7 @@ export class CredentialsComponent {
   savingTfa: boolean = false;
   newSecret: string = '';
   provisionUrl: string = '';
+  notice: Notice;
 
   constructor(
     private credentialsService: CredentialsService,
@@ -65,6 +68,7 @@ export class CredentialsComponent {
     private dialogRef: MatDialogRef<CredentialsData, CredentialsData>,
     private fb: FormBuilder
   ) {
+    this.notice = new Notice(snackBar);
     this.original = data;
     this.newSecret = TwoFactorAuth.generate_secret();
     const tfa = new TwoFactorAuth(this.newSecret);
@@ -115,23 +119,6 @@ export class CredentialsComponent {
       this.tfaForm.get('otp')?.disable();
     }
   }
-  showError(message: string) {
-    this.snackBar.open(message, 'Dismiss', {
-      duration: 222000,
-      horizontalPosition: 'center',
-      verticalPosition: 'bottom',
-      panelClass: 'error'
-    });
-  }
-  showSuccess(message: string) {
-    this.snackBar.open(message, 'Dismiss', {
-      duration: 222000,
-      horizontalPosition: 'center',
-      verticalPosition: 'bottom',
-      panelClass: 'success'
-    });
-
-  }
   saveCredentials() {
     if (!this.credentialsForm.valid) return;
     this.savingCredentials = true;
@@ -145,11 +132,11 @@ export class CredentialsComponent {
     )
       .subscribe({
         next: result => {
-          this.showSuccess(result.message);
+          this.notice.success(result.message);
           this.original.username = username;
           this.original.password = password;
         }, error: (error: Error) => {
-          this.showError(error.message);
+          this.notice.error(error.message);
           this.savingCredentials = false;
         }, complete: () => {
           this.savingCredentials = false;
@@ -175,7 +162,7 @@ export class CredentialsComponent {
         expectedOta = await tfa.get_relative_otp(1);
       }
       if (expectedOta !== otp) {
-        this.showError('Incorrect OTP provided.');
+        this.notice.error('Incorrect OTP provided.');
         this.savingTfa = false;
         return;
       }
@@ -183,9 +170,9 @@ export class CredentialsComponent {
     this.credentialsService.saveTwoFactorAuth(secret, otp)
       .subscribe({
         next: (result) => {
-          this.showSuccess(result.message);
+          this.notice.success(result.message);
         }, error: (error: Error) => {
-          this.showError(error.message);
+          this.notice.error(error.message);
           this.savingTfa = false;
         }, complete: () => {
           this.savingTfa = false;
