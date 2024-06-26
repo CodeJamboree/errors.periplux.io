@@ -7,6 +7,8 @@ import { AgePipe } from './app/pipes/AgePipe';
 import { DurationPipe } from './app/pipes/DurationPipe';
 
 import { routes } from './app.routes';
+import { AuthGuard } from './AuthGuard';
+import { AuthService } from './AuthService';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,6 +16,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(),
     provideAnimations(),
+    AuthGuard,
+    [{ provide: AuthService, useClass: AuthService, providedIn: 'root' }],
     DatePipe,
     AgePipe,
     DurationPipe

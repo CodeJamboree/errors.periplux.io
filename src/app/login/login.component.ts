@@ -1,9 +1,10 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
 import { MatTableModule } from "@angular/material/table";
-import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, FormGroup, FormControl, Validators, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -18,6 +19,7 @@ import {
 } from '../validators';
 import { LoginService } from './login.service';
 import { Notice } from '../Notice';
+import { AuthService } from '../../AuthService';
 
 @Component({
   selector: 'app-login',
@@ -38,15 +40,19 @@ import { Notice } from '../Notice';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   waiting: boolean = false;
   notice: Notice;
+  returnUrl?: string;
 
   constructor(
     private loginService: LoginService,
     @Inject(MatSnackBar) private snackBar: MatSnackBar,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private auth: AuthService
   ) {
     this.notice = new Notice(snackBar);
     this.loginForm = this.fb.group({
@@ -66,7 +72,11 @@ export class LoginComponent {
     });
 
   }
-
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.returnUrl = params['returnUrl'];
+    });
+  }
   login() {
     if (!this.loginForm.valid) return;
     this.waiting = true;
@@ -78,13 +88,22 @@ export class LoginComponent {
       .subscribe({
         next: result => {
           this.notice.success(result.message);
+          this.auth.setIsLoggedIn(true);
         }, error: (error: Error) => {
           this.notice.error(error.message);
           this.waiting = false;
         }, complete: () => {
           this.waiting = false;
+          this.navigateToReturnUrl();
         }
       });
+  }
+  navigateToReturnUrl() {
+    if (this.returnUrl) {
+      this.router.navigate([this.returnUrl]);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
 }
