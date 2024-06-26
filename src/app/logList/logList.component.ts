@@ -60,25 +60,19 @@ export class LogListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        const page = this.activatedRoute.snapshot.queryParamMap.get('page');
-        const size = this.activatedRoute.snapshot.queryParamMap.get('size');
-        const id = this.activatedRoute.snapshot.queryParamMap.get('id');
-        const searchText = this.activatedRoute.snapshot.queryParamMap.get('search') ?? '';
+    this.activatedRoute.queryParams.subscribe(params => {
+      const { page = '', size = '', id = '', searchText = '' } = params;
 
-        let pageIndex = page ? parseInt(page, 10) - 1 : 0;
-        if (pageIndex < 0) pageIndex = 0;
-        let pageSize = size ? parseInt(size, 10) : defaultPageSize;
-        if (!this.pageSizeOptions.includes(pageSize)) {
-          pageSize = defaultPageSize;
-        }
-        let logId = id ? parseInt(id, 10) : undefined;
-
-        this.selectedId = logId;
-        this.searchInput = searchText;
-        this.loadData(pageIndex, pageSize, searchText);
+      let pageIndex = page ? parseInt(page, 10) - 1 : 0;
+      if (pageIndex < 0) pageIndex = 0;
+      let pageSize = size ? parseInt(size, 10) : defaultPageSize;
+      if (!this.pageSizeOptions.includes(pageSize)) {
+        pageSize = defaultPageSize;
       }
+      let logId = id ? parseInt(id, 10) : undefined;
+      this.selectedId = logId;
+      this.searchInput = searchText;
+      this.loadData(pageIndex, pageSize, searchText);
     });
   }
 
