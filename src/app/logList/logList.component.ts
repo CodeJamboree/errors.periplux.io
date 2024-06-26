@@ -62,7 +62,6 @@ export class LogListComponent implements OnInit {
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe(params => {
       const { page = '', size = '', id = '', searchText = '' } = params;
-
       let pageIndex = page ? parseInt(page, 10) - 1 : 0;
       if (pageIndex < 0) pageIndex = 0;
       let pageSize = size ? parseInt(size, 10) : defaultPageSize;
