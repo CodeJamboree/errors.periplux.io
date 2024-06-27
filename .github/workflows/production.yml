@@ -1,0 +1,168 @@
+on:
+  push:
+    branches:
+      - production
+
+name: Production
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    timeout-minutes: 1
+
+    steps:
+      - name: Started
+        run: |
+          TZ=America/New_York date '+%A, %Y-%m-%d %I:%M:%S %p %z'
+          export TZ=UTC
+        shell: bash
+
+      - name: Get latest code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Angular
+        run: npm run build
+      
+      - name: Copy fiiles
+        run: |
+          mkdir build
+          cp -r dist/errors.periplux.io/browser/* build/
+          cp dist/errors.periplux.io/3rdpartylicenses.txt build/
+          cp php/* build/
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-files
+          path: ./build
+
+      - name: Completed
+        run: |
+          TZ=America/New_York date '+%A, %Y-%m-%d %I:%M:%S %p %z'
+          export TZ=UTC
+        shell: bash
+  
+  deploy:
+    name: Deploy Website
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    timeout-minutes: 3 # Don't let FTP hang
+
+    steps:
+      - name: Started
+        run: |
+          TZ=America/New_York date '+%A, %Y-%m-%d %I:%M:%S %p %z'
+          export TZ=UTC
+        shell: bash
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-files
+
+      - name: Set Environemnt in .htaccess
+        run: |
+          echo "" >> .htaccess
+          echo "# CONTENT APPENDED BY BUILD SERVER" >> .htaccess
+          echo "" >> .htaccess
+          echo "php_flag log_errors ${{vars.ERROR_LOGGED }}" >> .htaccess
+          echo "php_value error_log \"${{vars.ERROR_FILE }}\"" >> .htaccess
+          echo "php_value error_reporting ${{vars.ERROR_TYPES }}" >> .htaccess
+          echo "SetEnv ERROR_LOG \"${{vars.ERROR_FILE }}\"" >> .htaccess
+          echo "SetEnv ENVIRONMENT \"PRODUCTION\"" >> .htaccess
+          echo "SetEnv SECRETS_DATABASE \"${{ secrets.SECRETS_DATABASE }}\"" >> .htaccess
+          echo "SetEnv SECRETS_KEY_PATH \"${{ vars.SECRETS_KEY_PATH }}\"" >> .htaccess
+          echo "SetEnv SECRETS_CACHE_HOST \"${{ vars.SECRETS_CACHE_HOST }}\"" >> .htaccess
+          echo "SetEnv SECRETS_CACHE_PORT \"${{ vars.SECRETS_CACHE_PORT }}\"" >> .htaccess
+          echo "SetEnv SECRETS_CACHE_PEPPER \"${{ secrets.SECRETS_CACHE_PEPPER }}\"" >> .htaccess
+
+      - name: Create Build Info
+        run: |
+          node -e " \
+            const fs = require('fs'); \
+            const info = {
+              date: Math.floor(new Date() / 1000)
+            }; \
+            [ \
+              'hash', \
+              'action', \
+              'attempt', \
+            ].forEach(name => { \
+              const env = 'BUILD_' + name.toUpperCase();
+              info[name] = process.env[env] ?? ''; \
+            }); \
+            fs.writeFileSync( \
+              './build-info.json', \
+              JSON.stringify(info, null, 2) \
+            ); \
+          "
+        env:
+          BUILD_HASH: ${{ github.sha }}
+          BUILD_ACTION: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BUILD_ATTEMPT: ${{ github.run_attempt }}
+
+      - name: Prepare FTP
+        run: touch .ftp-deploy-sync-state.json
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ vars.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ''
+          timeout: 2000
+
+      - name: Completed
+        run: |
+          TZ=America/New_York date '+%A, %Y-%m-%d %I:%M:%S %p %z'
+          export TZ=UTC
+        shell: bash
+    
+  post-deploy:
+    name: Post Deploy
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/develop'
+    timeout-minutes: 1
+
+    steps:
+      - name: Started
+        run: |
+          TZ=America/New_York date '+%A, %Y-%m-%d %I:%M:%S %p %z'
+          export TZ=UTC
+        shell: bash
+
+      - name: Request deployed build info
+        run: |
+          set -e
+          http_response=$( \
+            curl -s \
+            -w "%{http_code}" \
+            -o - \
+            https://errors.periplux.io/build-info \
+          )
+          http_status=${http_response:(-3)}
+          http_content=${http_response:0:-3}
+          echo "$http_content"
+          if [ "$http_status" -ne 200 ]; then
+            echo "HTTP status is not 200 OK"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Completed
+        run: |
+          TZ=America/New_York date '+%A, %Y-%m-%d %I:%M:%S %p %z'
+          export TZ=UTC
+        shell: bash
