@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 import { PaginatedResponse } from '../types/PaginatedData';
 import { ItemResponse } from '../types/ItemResponse';
 import { Api } from '../../Api';
+import { sqlLike } from '../search/sqlLike';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,7 @@ export class LogListService {
   }
 
   getPage(page: number, size: number, search: string) {
+    search = sqlLike(search);
     return this.api.get<PaginatedResponse<LogData>>('logs', { page, size, search })
       .pipe(
         map(data => {
