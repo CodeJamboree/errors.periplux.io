@@ -89,6 +89,15 @@ export class TfaComponent implements OnInit {
           }
         }, error: (error: Error) => {
           this.notice.error(error.message);
+          if (error.message === "Token expired") {
+            this.auth.logout();
+            const extras = {
+              queryParams: {
+                returnUrl: this.returnUrl
+              }
+            };
+            this.router.navigate(['login'], extras);
+          }
           this.waiting = false;
         }, complete: () => {
           this.waiting = false;
