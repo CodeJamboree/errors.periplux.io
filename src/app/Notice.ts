@@ -9,7 +9,7 @@ export class Notice {
   }
   show(message: string, panelClass: 'error' | 'success' = 'success') {
     this.snackBar.open(message, 'Dismiss', {
-      duration: 2000,
+      duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'bottom',
       panelClass
