@@ -1,11 +1,15 @@
 /* eslint-disable no-console */
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, Inject } from '@angular/core';
 import { NgFor, CommonModule } from '@angular/common';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 import { LogItemDatesService } from './logItemDates.service';
 import { LogItemDateData } from './LogItemDateData';
 import { DurationPipe } from '../pipes/DurationPipe';
-import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { graphDates } from './utils/graphDates';
+import { Notice } from '../Notice';
 
 @Component({
   selector: 'log-item-dates',
@@ -15,7 +19,8 @@ import { graphDates } from './utils/graphDates';
     MatPaginatorModule,
     NgFor,
     CommonModule,
-    DurationPipe
+    DurationPipe,
+    MatProgressSpinnerModule
   ],
   standalone: true
 })
@@ -28,8 +33,14 @@ export class LogItemDatesComponent implements OnInit {
   pageIndex: number = 0;
   data: LogItemDateData[] = [];
   graphDates = graphDates;
+  waiting: boolean = false;
+  notice: Notice;
 
-  constructor(private logItemDatesService: LogItemDatesService) {
+  constructor(
+    private logItemDatesService: LogItemDatesService,
+    @Inject(MatSnackBar) private snackBar: MatSnackBar,
+  ) {
+    this.notice = new Notice(snackBar);
   }
 
   ngOnInit() {
@@ -40,12 +51,20 @@ export class LogItemDatesComponent implements OnInit {
   }
 
   loadData(pageIndex: number, pageSize: number) {
+    this.waiting = true;
     this.logItemDatesService.getPage(this.id, pageIndex + 1, pageSize)
-      .subscribe(response => {
-        this.pageSize = pageSize;
-        this.pageIndex = pageIndex;
-        this.data = response.data;
-        this.totalItems = response.total;
+      .subscribe({
+        next: response => {
+          this.pageSize = pageSize;
+          this.pageIndex = pageIndex;
+          this.data = response.data;
+          this.totalItems = response.total;
+        }, error: (error: Error) => {
+          this.notice.error(error.message);
+          this.waiting = false;
+        }, complete: () => {
+          this.waiting = false;
+        }
       });
   }
   handlePageEvent(event: PageEvent) {

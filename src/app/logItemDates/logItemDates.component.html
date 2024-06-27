@@ -17,6 +17,9 @@
     </tr>
   </tbody>
 </table>
-
-<mat-paginator *ngIf="showPagnator()" #paginator [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
-  [length]="totalItems" [pageIndex]="pageIndex" (page)="handlePageEvent($event)"></mat-paginator>
+<div class="bottom-controls">
+  <mat-progress-spinner *ngIf="waiting" mode="indeterminate" diameter="32"></mat-progress-spinner>
+  <mat-paginator [disabled]="waiting" *ngIf="showPagnator()" #paginator [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions" [length]="totalItems" [pageIndex]="pageIndex"
+    (page)="handlePageEvent($event)"></mat-paginator>
+</div>

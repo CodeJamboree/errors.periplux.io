@@ -8,6 +8,7 @@ import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/p
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { LogListService } from './logList.service';
 import { LogItemComponent } from '../logItem/logItem.component';
@@ -19,7 +20,6 @@ import { LogItemComponentData } from '../logItem/LogItemComponentData';
 import { CredentialsComponent } from '../credentials/credentials.component';
 import { CredentialsData } from '../credentials/CredentialsData';
 import { AuthService } from '../../AuthService';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Notice } from '../Notice';
 
 const defaultPageSize = 25;
