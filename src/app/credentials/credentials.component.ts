@@ -197,6 +197,21 @@ export class CredentialsComponent {
         }
       });
   }
+  splitSecret() {
+    const parts = [];
+    const size = 4;
+    for (let i = 0; i < this.newSecret.length; i += size) {
+      parts.push(this.newSecret.substring(i, i + size))
+    }
+    return parts;
+  }
+  copySecret() {
+    navigator.clipboard.writeText(this.newSecret).then(() => {
+      this.notice.success("Copied to clipboard")
+    }).catch(e => {
+      this.notice.error("Failed to copy to clipboard");
+    });
+  }
   async saveTwoFactorAuth() {
     if (!this.tfaForm.valid) return;
     this.savingTfa = true;
