@@ -6,6 +6,12 @@
 .bottom-controls {
   display: flex;
   justify-content: space-between;
+
+  form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 }
 
 .log-id-form {

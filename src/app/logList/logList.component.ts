@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { NgFor, CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatButtonModule } from "@angular/material/button";
@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { LogListService } from './logList.service';
 import { LogItemComponent } from '../logItem/logItem.component';
@@ -18,6 +19,8 @@ import { LogItemComponentData } from '../logItem/LogItemComponentData';
 import { CredentialsComponent } from '../credentials/credentials.component';
 import { CredentialsData } from '../credentials/CredentialsData';
 import { AuthService } from '../../AuthService';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Notice } from '../Notice';
 
 const defaultPageSize = 25;
 
@@ -34,7 +37,8 @@ const defaultPageSize = 25;
     MatButtonModule,
     FormsModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatProgressSpinnerModule
   ],
   standalone: true
 })
@@ -48,17 +52,22 @@ export class LogListComponent implements OnInit {
   searchInput: string = '';
   searchText: string = '';
   data: LogData[] = [];
+  searchWaiting: boolean = false;
+  loadSelectedWaiting: boolean = false;
   isDialogOpen: boolean = false;
   errorTypeAsEmoji = errorTypeAsEmoji;
   generateMatrixImage = generateMatrixImage;
+  notice: Notice;
 
   constructor(
     private logListService: LogListService,
     public dialog: MatDialog,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private auth: AuthService
+    private auth: AuthService,
+    @Inject(MatSnackBar) private snackBar: MatSnackBar,
   ) {
+    this.notice = new Notice(snackBar);
   }
 
   ngOnInit() {
@@ -102,15 +111,23 @@ export class LogListComponent implements OnInit {
     if (pageIndex === this.pageIndex && pageSize === this.pageSize && search === this.searchText) {
       return;
     }
+    this.searchWaiting = true;
     this.logListService.getPage(pageIndex + 1, pageSize, search)
-      .subscribe(response => {
-        this.pageSize = pageSize;
-        this.pageIndex = pageIndex;
-        this.searchText = search;
-        this.data = response.data;
-        this.totalItems = response.total;
-        this.updateQueryPrams();
-        this.loadSelected();
+      .subscribe({
+        next: response => {
+          this.pageSize = pageSize;
+          this.pageIndex = pageIndex;
+          this.searchText = search;
+          this.data = response.data;
+          this.totalItems = response.total;
+          this.updateQueryPrams();
+          this.loadSelected();
+        }, error: (error: Error) => {
+          this.notice.error(error.message);
+          this.searchWaiting = false;
+        }, complete: () => {
+          this.searchWaiting = false;
+        }
       });
   }
   loadSelected() {
@@ -125,9 +142,17 @@ export class LogListComponent implements OnInit {
       this.onRowClick(selected);
       return;
     }
+    this.loadSelectedWaiting = true;
     this.logListService.getItem(this.selectedId)
-      .subscribe(item => {
-        this.onRowClick(item);
+      .subscribe({
+        next: item => {
+          this.onRowClick(item);
+        }, error: (error: Error) => {
+          this.notice.error(error.message);
+          this.loadSelectedWaiting = false;
+        }, complete: () => {
+          this.loadSelectedWaiting = false;
+        }
       })
   }
   handlePageEvent(event: PageEvent) {

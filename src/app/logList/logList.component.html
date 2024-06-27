@@ -2,9 +2,12 @@
   <form>
     <mat-form-field appearance="fill" class="search-form">
       <mat-label>Search</mat-label>
-      <input matInput mat-form-field data-1p-ignore size="10" id="search" [(ngModel)]="searchInput" name="search">
+      <input [disabled]="searchWaiting" matInput mat-form-field data-1p-ignore size="10" id="search"
+        [(ngModel)]="searchInput" name="search">
     </mat-form-field>
-    <button color="primary" mat-raised-button type="submit" (click)="search()">Search</button>
+    <button color="primary" [disabled]="searchWaiting" mat-raised-button type="submit"
+      (click)="search()">Search</button>
+    <mat-progress-spinner *ngIf="searchWaiting" mode="indeterminate" diameter="32"></mat-progress-spinner>
   </form>
   <div>
     <button color="secondary" mat-stroked-button (click)="editSettings()">Settings</button>
@@ -67,11 +70,13 @@
   <form>
     <mat-form-field appearance="fill" class="log-id-form">
       <mat-label>Log Id</mat-label>
-      <input matInput mat-form-field type="number" min="1" data-1p-ignore size="5" id="selectedId"
-        [(ngModel)]="selectedId" name="selectedId">
+      <input [disabled]="loadSelectedWaiting" matInput mat-form-field type="number" min="1" data-1p-ignore size="5"
+        id="selectedId" [(ngModel)]="selectedId" name="selectedId">
     </mat-form-field>
-    <button color="primary" mat-raised-button type="submit" (click)="loadSelected()">Lookup</button>
+    <button color="primary" [disabled]="loadSelectedWaiting" mat-raised-button type="submit"
+      (click)="loadSelected()">Lookup</button>
+    <mat-progress-spinner *ngIf="loadSelectedWaiting" mode="indeterminate" diameter="32"></mat-progress-spinner>
   </form>
-  <mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" [length]="totalItems"
-    [pageIndex]="pageIndex" (page)="handlePageEvent($event)"></mat-paginator>
+  <mat-paginator #paginator [disabled]="searchWaiting" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+    [length]="totalItems" [pageIndex]="pageIndex" (page)="handlePageEvent($event)"></mat-paginator>
 </div>
