@@ -1,6 +1,7 @@
 RewriteEngine On
 
 ErrorLog error.log
+ErrorDocument 404 /
 
 # Prevent accessing any file beginning wit a dot
 <FilesMatch "^\.">
