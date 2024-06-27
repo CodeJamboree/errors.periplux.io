@@ -14,4 +14,7 @@ export class CredentialsService {
   saveTwoFactorAuth(secret: string, otp: string) {
     return this.api.post<MessageResponse>('tfa-change', { secret, otp });
   }
+  getUserInfo() {
+    return this.api.get<{ username: string, tfa_enabled: boolean }>('login-info', {})
+  }
 }

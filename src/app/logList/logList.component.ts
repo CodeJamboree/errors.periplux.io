@@ -210,8 +210,7 @@ export class LogListComponent implements OnInit {
     return path.substring(i + 1);
   }
   editSettings() {
-    const config = new MatDialogConfig<CredentialsData>();
-    config.data = { username: "foo" };
+    const config = new MatDialogConfig<never>();
     config.disableClose = false;
     config.hasBackdrop = true;
     config.minWidth = "50%";
@@ -220,11 +219,7 @@ export class LogListComponent implements OnInit {
     config.minHeight = "50%";
     config.maxHeight = "90%";
     config.height = "1000px";
-
-    const dialogRef = this.dialog.open<CredentialsComponent, CredentialsData, CredentialsData>(CredentialsComponent, config);
-    dialogRef.afterClosed().subscribe(data => {
-      // foo
-    });
+    this.dialog.open<CredentialsComponent, never, never>(CredentialsComponent, config);
   }
   logout() {
     this.auth.logout();

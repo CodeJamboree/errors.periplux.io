@@ -15,7 +15,6 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 import { QrCodeModule } from 'ng-qrcode';
 
-import { CredentialsData } from './CredentialsData';
 import { CredentialsService } from './credentials.service';
 import { Notice } from '../Notice';
 
@@ -53,36 +52,33 @@ import { TwoFactorAuth } from './TwoFactorAuth';
 export class CredentialsComponent {
   credentialsForm: FormGroup;
   tfaForm: FormGroup;
-  original: CredentialsData;
   savingCredentials: boolean = false;
   savingTfa: boolean = false;
   newSecret: string = '';
   provisionUrl: string = '';
   notice: Notice;
+  provisionAccount: string = '';
 
   constructor(
     private credentialsService: CredentialsService,
     @Inject(MatSnackBar) private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: CredentialsData,
     public dialog: MatDialog,
-    private dialogRef: MatDialogRef<CredentialsData, CredentialsData>,
+    private dialogRef: MatDialogRef<never>,
     private fb: FormBuilder
   ) {
     this.notice = new Notice(snackBar);
-    this.original = data;
-    this.newSecret = TwoFactorAuth.generate_secret();
-    const tfa = new TwoFactorAuth(this.newSecret);
-    let issuer = document.title;
-    const account = data.username;
-    this.provisionUrl = tfa.generate_provisioning_uri({ account, issuer });
+    // this.newSecret = TwoFactorAuth.generate_secret();
+    // const tfa = new TwoFactorAuth(this.newSecret);
+    // let issuer = document.title;
+    // this.provisionUrl = tfa.generate_provisioning_uri({ account: '', issuer });
 
     this.credentialsForm = this.fb.group({
-      username: new FormControl(data.username, [
+      username: new FormControl('', [
         Validators.required,
         Validators.minLength(3),
         alphaNumericOnlyValidator
       ]),
-      password: new FormControl(data.password, [
+      password: new FormControl('', [
         Validators.required,
         Validators.minLength(8),
         lowercaseRequiredValidator,
@@ -94,7 +90,7 @@ export class CredentialsComponent {
     this.tfaForm = this.fb.group({
       otp: new FormControl<string>({
         value: '',
-        disabled: false
+        disabled: true
       }, [
         Validators.minLength(6),
         Validators.maxLength(6),
@@ -105,11 +101,46 @@ export class CredentialsComponent {
         }),
       ]),
       enabled: new FormControl<boolean>({
-        value: true,
+        value: false,
         disabled: false
       })
     });
-
+    this.loadUserInfo();
+  }
+  loadUserInfo() {
+    this.savingCredentials = true;
+    this.credentialsService.getUserInfo().subscribe({
+      next: (info) => {
+        this.credentialsForm.get('username')?.setValue(info.username);
+        this.tfaForm.get('enabled')?.setValue(info.tfa_enabled);
+        this.changeTfaEnabled();
+      },
+      error: (error: Error) => {
+        this.savingCredentials = false;
+        this.notice.error(error.message);
+      },
+      complete: () => {
+        this.savingCredentials = false;
+      }
+    })
+  }
+  changeSecret() {
+    if (!(this.tfaForm.get('enabled')?.value ?? false)) {
+      this.newSecret = '';
+      this.provisionUrl = '';
+      return;
+    }
+    const username = this.credentialsForm.get('username')?.value ?? '';
+    if (this.newSecret !== '' && this.provisionAccount === username) {
+      return;
+    }
+    this.provisionAccount = username;
+    this.newSecret = TwoFactorAuth.generate_secret();
+    const tfa = new TwoFactorAuth(this.newSecret);
+    this.provisionUrl = tfa.generate_provisioning_uri({
+      account: username,
+      issuer: document.title
+    });
   }
   changeTfaEnabled() {
     const enabled = Boolean(this.tfaForm.get('enabled')?.value);
@@ -118,6 +149,7 @@ export class CredentialsComponent {
     } else {
       this.tfaForm.get('otp')?.disable();
     }
+    this.changeSecret();
   }
   saveCredentials() {
     if (!this.credentialsForm.valid) return;
@@ -133,13 +165,13 @@ export class CredentialsComponent {
       .subscribe({
         next: result => {
           this.notice.success(result.message);
-          this.original.username = username;
-          this.original.password = password;
         }, error: (error: Error) => {
           this.notice.error(error.message);
           this.savingCredentials = false;
         }, complete: () => {
           this.savingCredentials = false;
+          // if username changed
+          this.changeSecret();
         }
       });
   }
@@ -180,6 +212,6 @@ export class CredentialsComponent {
       });
   }
   close() {
-    this.dialogRef.close(this.original);
+    this.dialogRef.close();
   }
 }
