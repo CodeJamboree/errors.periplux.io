@@ -56,7 +56,7 @@ jobs:
           mkdir build
           cp -r dist/errors.periplux.io/browser/* build/
           cp dist/errors.periplux.io/3rdpartylicenses.txt build/
-          cp php/* build/
+          cp -r php/* build/
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
