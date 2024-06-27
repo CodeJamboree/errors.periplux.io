@@ -31,6 +31,7 @@ jobs:
 
       - name: Create environment file
         run: |
+          mkdir src/environments
           touch src/environments/environment.production.ts
           echo "export const environment ={" >> src/environments/environment.production.ts
           echo "  api: \"${{vars.ERROR_API}}\"," >> src/environments/environment.production.ts
