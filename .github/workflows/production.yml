@@ -56,7 +56,7 @@ jobs:
           mkdir build
           cp -r dist/errors.periplux.io/browser/* build/
           cp dist/errors.periplux.io/3rdpartylicenses.txt build/
-          rsync -r --include="*/.htaccess" php/* build/
+          rsync -r -v --include="*/.htaccess" php/* build/
       
       - name: Create tar archive
         run: tar -cvf ./web_files.tar --include="*/.htaccess" ./build
