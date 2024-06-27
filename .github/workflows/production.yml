@@ -59,7 +59,7 @@ jobs:
           rsync -r --include="*/.htaccess" php/* build/
       
       - name: Create tar archive
-        run: tar -cvf ./web_files.tar ./build
+        run: tar -cvf ./web_files.tar --include="*/.htaccess" ./build
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
