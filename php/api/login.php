@@ -39,11 +39,16 @@ function main()
 
     if ($credentials['username'] !== $username ||
         $credentials['password_hash'] !== $password_hash) {
-        \error_log\rate_limiting\failed_attempt(
-            "The username or password you entered is incorrect.",
-            3,
-            300
-        );
+        $message = "The username or password you entered is incorrect.";
+        if ($credentials['username'] === $username) {
+            \error_log\rate_limiting\failed_attempt(
+                $message,
+                3,
+                300
+            );
+        } else {
+            Show::error($message);
+        }
         exit;
     }
 
