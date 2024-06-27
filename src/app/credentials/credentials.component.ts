@@ -27,6 +27,9 @@ import {
   conditionallyRequredValidator
 } from '../validators';
 import { TwoFactorAuth } from './TwoFactorAuth';
+
+type blurrable = 'blurrable blurred' | 'blurrable clear';
+
 @Component({
   selector: 'app-credentials',
   templateUrl: './credentials.component.html',
@@ -58,6 +61,10 @@ export class CredentialsComponent {
   provisionUrl: string = '';
   notice: Notice;
   provisionAccount: string = '';
+  isQrCodeBlurred: boolean = true;
+  qrCodeClassName: blurrable = 'blurrable blurred';
+  isSecretBlurred: boolean = true;
+  secretClassName: blurrable = 'blurrable blurred';
 
   constructor(
     private credentialsService: CredentialsService,
@@ -124,6 +131,20 @@ export class CredentialsComponent {
       }
     })
   }
+  hideSensitive() {
+    this.isQrCodeBlurred = true;
+    this.qrCodeClassName = 'blurrable blurred';
+    this.isSecretBlurred = true;
+    this.secretClassName = 'blurrable blurred';
+  }
+  toggleQrVisibility() {
+    this.isQrCodeBlurred = !this.isQrCodeBlurred;
+    this.qrCodeClassName = this.isQrCodeBlurred ? 'blurrable blurred' : 'blurrable clear';
+  }
+  toggleSecretVisibility() {
+    this.isSecretBlurred = !this.isSecretBlurred;
+    this.secretClassName = this.isSecretBlurred ? 'blurrable blurred' : 'blurrable clear';
+  }
   changeSecret() {
     if (!(this.tfaForm.get('enabled')?.value ?? false)) {
       this.newSecret = '';
@@ -134,6 +155,7 @@ export class CredentialsComponent {
     if (this.newSecret !== '' && this.provisionAccount === username) {
       return;
     }
+    this.hideSensitive();
     this.provisionAccount = username;
     this.newSecret = TwoFactorAuth.generate_secret();
     const tfa = new TwoFactorAuth(this.newSecret);
@@ -199,6 +221,7 @@ export class CredentialsComponent {
         return;
       }
     }
+    this.hideSensitive();
     this.credentialsService.saveTwoFactorAuth(secret, otp)
       .subscribe({
         next: (result) => {
