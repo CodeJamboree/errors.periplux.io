@@ -20,3 +20,10 @@
   white-space: pre-wrap;
   overflow-x: auto
 }
+
+.bottom-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: right;
+  align-items: center;
+}
