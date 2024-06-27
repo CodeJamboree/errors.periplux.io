@@ -5,7 +5,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { LogListService } from './logList.service';
@@ -63,7 +63,7 @@ export class LogListComponent implements OnInit {
 
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe(params => {
-      const { page = '', size = '', id = '', searchText = '' } = params;
+      const { page = '', size = '', id = '', search = '' } = params;
       let pageIndex = page ? parseInt(page, 10) - 1 : 0;
       if (pageIndex < 0) pageIndex = 0;
       let pageSize = size ? parseInt(size, 10) : defaultPageSize;
@@ -72,8 +72,8 @@ export class LogListComponent implements OnInit {
       }
       let logId = id ? parseInt(id, 10) : undefined;
       this.selectedId = logId;
-      this.searchInput = searchText;
-      this.loadData(pageIndex, pageSize, searchText);
+      this.searchInput = search;
+      this.loadData(pageIndex, pageSize, search);
     });
   }
 
