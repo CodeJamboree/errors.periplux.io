@@ -29,6 +29,14 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Create environment file
+        run: |
+          touch src/environments/environment.production.ts
+          echo "export const environment ={" >> src/environments/environment.production.ts
+          echo "  api: \"${{vars.ERROR_API}}\"," >> src/environments/environment.production.ts
+          echo "  censor: ${{secrets.CENSOR }}" >> src/environments/environment.production.ts
+          echo "}" >> src/environments/environment.production.ts
+
       - name: Build Angular
         run: npm run build
       

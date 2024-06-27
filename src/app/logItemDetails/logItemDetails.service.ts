@@ -21,7 +21,7 @@ export class LogItemDetailsService {
     }).pipe(
       map(data => {
         data.data.forEach(async (item, i) => {
-          item.details = environment.censor(item.details);
+          item.details = item.details.replaceAll(environment.censor, '***');
         })
         return data;
       }));

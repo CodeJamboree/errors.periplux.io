@@ -47,8 +47,8 @@ export class LogListService {
   }
   transform(items: LogData[]) {
     items.forEach(async item => {
-      item.path = environment.censor(item.path);
-      item.message = environment.censor(item.message);
+      item.path = item.path.replaceAll(environment.censor, '***');
+      item.message = item.message.replaceAll(environment.censor, '***');
       item.message_hash = await this.hash(item.message);
       item.scope_hash = await this.hash(item.scope);
       item.path_hash = await this.hash(item.path);
