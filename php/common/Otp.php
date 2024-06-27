@@ -20,6 +20,15 @@ class Otp
     private string $secret;
 
     /**
+     * Number of seconds before token changes.
+     * @return int The number of seconds before a token changes
+     */
+    public function period()
+    {
+        return $this->period;
+    }
+
+    /**
      * Constructor for the Otp class.
      *
      * Initializes a new instance of the Otp class with the provided parameters.

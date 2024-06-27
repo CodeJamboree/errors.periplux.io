@@ -592,23 +592,42 @@ final class Secrets
 
         return $result;
     }
-    public static function revealAs(string $name, string $type)
+    public static function revealAs(string $name, string $type, ?string $scope = null)
     {
-        $value = self::reveal($name);
+        switch ($type) {
+            case 'array':
+                return self::revealArray($name, $scope);
+            case 'int':
+                return self::revealInt($name, $scope);
+            default:
+                return false;
+        }
+    }
+    public static function revealInt(string $name, ?string $scope = null)
+    {
+        $value = self::reveal($name, $scope);
         if ($value === false) {
             return false;
         }
-
         try {
-            switch ($type) {
-                case 'array':
-                    return json_decode($value, true);
-                case 'int':
-                    return intval($value);
-                default:
-                    return false;
-            }
+            return intval($value);
         } catch (Exception $e) {
+            return false;
+        }
+    }
+    public static function revealArray(string $name, ?string $scope = null)
+    {
+        $value = self::reveal($name, $scope);
+        if ($value === false) {
+            return false;
+        }
+        try {
+            $array = json_decode($value, true);
+            if ($array === null || $array === false) {
+                return false;
+            }
+            return $array;
+        } catch (Exception) {
             return false;
         }
     }
@@ -902,7 +921,18 @@ final class Secrets
 
         return $relativePath;
     }
-
+    public static function keepInt(string $name, #[SensitiveParameter] ?int $value = null, ?string $scope = null)
+    {
+        return self::keep($name, $value, $scope);
+    }
+    public static function keepArray(string $name, #[SensitiveParameter] ?array $value = [], ?string $scope = null)
+    {
+        if (empty($value)) {
+            return self::keep($name, '', $scope);
+        } else {
+            return self::keep($name, json_encode($value, JSON_PRETTY_PRINT), $scope);
+        }
+    }
     public static function keep(string $name, #[SensitiveParameter] ?string $value = '', ?string $scope = null)
     {
         if (!self::valid_name($name)) {

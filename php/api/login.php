@@ -3,6 +3,7 @@ require_once "../common/session.php";
 require_once "../common/Show.php";
 require_once "../common/Secrets.php";
 require_once "../common/PostedJson.php";
+require_once "../common/rate_limiting.php";
 
 function main()
 {
@@ -28,19 +29,21 @@ function main()
         exit;
     }
 
-    $credentials = Secrets::revealAs("CREDENTIALS", 'array');
+    \error_log\rate_limiting\guard_locked_accounts();
 
-    if ($credentials['username'] !== $username) {
-        Show::error('Invalid credentials');
-        exit;
-    }
+    $credentials = Secrets::revealArray("CREDENTIALS");
 
     $password_salt = $credentials['password_salt'];
     $hash = hash('sha256', $password . $password_salt);
     $password_hash = bin2hex($hash);
 
-    if ($credentials['password_hash'] !== $password_hash) {
-        Show::error('Invalid credentials');
+    if ($credentials['username'] !== $username ||
+        $credentials['password_hash'] !== $password_hash) {
+        \error_log\rate_limiting\failed_attempt(
+            "The username or password you entered is incorrect.",
+            3,
+            300
+        );
         exit;
     }
 
@@ -59,8 +62,8 @@ function main()
         'otp_required' => $otp_required,
         'token' => $token_hash,
     ];
-    $json = json_encode($data, JSON_PRETTY_PRINT);
-    Secrets::keep("AUTHENTICATION", $json);
+    Secrets::keepArray("AUTHENTICATION", $data);
+    \error_log\rate_limiting\successful_attempt();
     Show::data($data);
     exit;
 }
