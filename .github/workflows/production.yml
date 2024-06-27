@@ -54,11 +54,11 @@ jobs:
       - name: Copy files
         run: |
           mkdir build
-          cp -r dist/errors.periplux.io/browser/* build/
-          cp dist/errors.periplux.io/3rdpartylicenses.txt build/
-          cp -r php/* build/
-          cp php/.htaccess build/
-      
+          rsync -v -r dist/errors.periplux.io/browser/* build/
+          rsync -v dist/errors.periplux.io/3rdpartylicenses.txt build/
+          rsync -v -r php/* build/
+          rsync -v php/.htaccess build/
+          
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
