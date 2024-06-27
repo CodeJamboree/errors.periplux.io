@@ -51,18 +51,21 @@ jobs:
       - name: Build Angular
         run: npm run build
       
-      - name: Copy fiiles
+      - name: Copy files
         run: |
           mkdir build
-          rsync -r dist/errors.periplux.io/browser/* build/
+          cp -r dist/errors.periplux.io/browser/* build/
           cp dist/errors.periplux.io/3rdpartylicenses.txt build/
           rsync -r --include="*/.htaccess" php/* build/
       
+      - name: Create tar archive
+        run: tar -cvf ./web_files.tar ./build
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-files
-          path: ./build
+          path: ./web_files.tar
 
       - name: Completed
         run: |
@@ -88,6 +91,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: web-files
+      
+      - name: Extract tar archive
+        run: |
+          tar -xf web_files.tar
+          rm web_files.tar
 
       - name: Set Environemnt in .htaccess
         run: |
