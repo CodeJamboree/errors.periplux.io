@@ -10,6 +10,8 @@
     <mat-progress-spinner *ngIf="searchWaiting" mode="indeterminate" diameter="32"></mat-progress-spinner>
   </form>
   <div>
+    <button *ngIf="hasPendingLogs" [disabled]="pendingLogWaiting || !hasPendingLogs" color="secondary"
+      mat-stroked-button (click)="transferLogs()">Transfer Logs</button>
     <button color="secondary" mat-stroked-button (click)="editSettings()">Settings</button>
     <button color="secondary" mat-stroked-button (click)="logout()">Log Out</button>
   </div>

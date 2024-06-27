@@ -7,6 +7,28 @@ import { PaginatedResponse } from '../types/PaginatedData';
 import { ItemResponse } from '../types/ItemResponse';
 import { Api } from '../../Api';
 import { sqlLike } from '../search/sqlLike';
+import { MessageResponse } from '../types/MessageResponse';
+
+interface PendingLog {
+  timestamp?: number,
+  type?: string,
+  message?: string,
+  path?: string,
+  line?: number,
+  details?: string[],
+  stack_trace?: string
+}
+interface PendingLogs {
+  logs: PendingLog[],
+  next_offset: number,
+  has_more: boolean
+}
+interface TransferLogs {
+  file: string,
+  transferred: number,
+  offset: number,
+  has_more: boolean
+}
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +56,22 @@ export class LogListService {
     return items;
   }
 
+  hasPendingLogs() {
+    return this.api.get<PendingLogs | MessageResponse>('view', { size: 1 }).pipe(map(
+      data => {
+        if ('message' in data) return false;
+        return data.logs.length !== 0;
+      }
+    ));
+  }
+  transferLogs() {
+    return this.api.get<TransferLogs | MessageResponse>('view', { size: 1 }).pipe(map(
+      data => {
+        if ('message' in data) throw new Error(data.message);
+        return data;
+      }
+    ));
+  }
   getPage(page: number, size: number, search: string) {
     search = sqlLike(search);
     return this.api.get<PaginatedResponse<LogData>>('logs', { page, size, search })

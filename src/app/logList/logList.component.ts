@@ -58,6 +58,8 @@ export class LogListComponent implements OnInit {
   errorTypeAsEmoji = errorTypeAsEmoji;
   generateMatrixImage = generateMatrixImage;
   notice: Notice;
+  pendingLogWaiting: boolean = false;
+  hasPendingLogs: boolean = false;
 
   constructor(
     private logListService: LogListService,
@@ -71,6 +73,7 @@ export class LogListComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.checkForPendingLogs();
     this.activatedRoute.queryParams.subscribe(params => {
       const { page = '', size = '', id = '', search = '' } = params;
       let pageIndex = page ? parseInt(page, 10) - 1 : 0;
@@ -127,6 +130,35 @@ export class LogListComponent implements OnInit {
           this.searchWaiting = false;
         }, complete: () => {
           this.searchWaiting = false;
+        }
+      });
+  }
+  checkForPendingLogs() {
+    this.pendingLogWaiting = true;
+    this.logListService.hasPendingLogs()
+      .subscribe({
+        next: pending => {
+          this.hasPendingLogs = pending;
+        }, error: (error: Error) => {
+          this.notice.error(error.message);
+          this.pendingLogWaiting = false;
+        }, complete: () => {
+          this.pendingLogWaiting = false;
+        }
+      });
+  }
+  transferLogs() {
+    this.pendingLogWaiting = true;
+    this.logListService.transferLogs()
+      .subscribe({
+        next: response => {
+          this.hasPendingLogs = response.has_more;
+          this.notice.success(`Logs Transferred: ${response.transferred}`);
+        }, error: (error: Error) => {
+          this.notice.error(error.message);
+          this.pendingLogWaiting = false;
+        }, complete: () => {
+          this.pendingLogWaiting = false;
         }
       });
   }

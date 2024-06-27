@@ -127,14 +127,12 @@ function main()
         Secrets::keep("ERROR_OFFSET", $next_offset);
     } else {
         // purge error log
-        if (unlink($path)) {
-            $next_offset = 0;
-            Secrets::keep("ERROR_OFFSET", 0);
-            Secrets::keep("ERROR_LOG", $next_file);
-        } else {
-            $next_offset = $file_size;
-            Secrets::keep("ERROR_OFFSET", $file_size);
-            Secrets::keep("ERROR_LOG", $file_name);
+        unlink($path);
+        $next_offset = 0;
+        Secrets::keep("ERROR_OFFSET", 0);
+        Secrets::keep("ERROR_LOG", $next_file);
+        if ($next_file !== $file_name && $next_file !== null) {
+            $has_more = true;
         }
     }
 
@@ -143,6 +141,7 @@ function main()
         "file" => $file_name,
         "transferred" => $count,
         "offset" => $next_offset,
+        "has_more" => $has_more,
     ]);
     exit;
 }
