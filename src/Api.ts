@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AuthService } from './AuthService';
 import { environment } from './environments/environment';
@@ -10,7 +11,8 @@ import { environment } from './environments/environment';
 export class Api {
   constructor(
     private http: HttpClient,
-    private auth: AuthService
+    private auth: AuthService,
+    private router: Router
   ) { }
   get<T>(stub: string, data: Record<string, any>): Observable<T> {
     let params = new HttpParams();
@@ -44,10 +46,23 @@ export class Api {
       this.errorHandler()
     );
   }
+  redirectLogin() {
+    this.auth.logout();
+    const { pathname, search, hash } = window.location;
+    const extras = {
+      queryParams: {
+        returnUrl: `${pathname}${search}${hash}`
+      }
+    };
+    this.router.navigate(['login'], extras);
+  }
   errorHandler<T>() {
     return catchError<T, Observable<never>>((response: HttpErrorResponse) => {
       try {
         const error = response.error.error;
+        if (error === "Unauthorized") {
+          this.redirectLogin();
+        }
         return throwError(() => new Error(error));
       } catch (e) {
         return throwError(() => new Error("Unexpected API response"));
