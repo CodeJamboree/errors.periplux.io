@@ -173,7 +173,7 @@ jobs:
             curl -s \
             -w "%{http_code}" \
             -o - \
-            https://errors.periplux.io/build-info \
+            https://errors.periplux.io/build-info.json \
           )
           http_status=${http_response:(-3)}
           http_content=${http_response:0:-3}
