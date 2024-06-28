@@ -176,6 +176,9 @@ function compile_stack($trace)
         $func = get_key_value('function', $frame, '');
         $class = get_key_value('class', $frame, '');
         $type = get_key_value('type', $frame, '');
+        if ($func != '') {
+            $func .= '()';
+        }
         $stack .= "#$index $file($line): $class$type$func\n";
     }
     return $stack;
