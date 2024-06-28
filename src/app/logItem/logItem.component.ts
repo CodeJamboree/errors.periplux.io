@@ -102,14 +102,20 @@ export class LogItemComponent implements OnInit, OnDestroy {
   durationMs() {
     return (this.item.last_at - this.item.first_at) * 1000;
   }
-  setData(data: LogData) {
+  setLog(data: LogData) {
     this.item = data;
   }
   next() {
-    this.nextItemEvent.emit({ id: this.item.id, setLog: this.setData.bind(this) });
+    this.nextItemEvent.emit({
+      id: this.item.id,
+      setLog: this.setLog.bind(this)
+    });
   }
   prior() {
-    this.priorItemEvent.emit({ id: this.item.id, setLog: this.setData.bind(this) });
+    this.priorItemEvent.emit({
+      id: this.item.id,
+      setLog: this.setLog.bind(this)
+    });
   }
   close() {
     this.dialogRef.close();
