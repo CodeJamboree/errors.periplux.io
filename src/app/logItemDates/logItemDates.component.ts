@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Component, OnInit, Input, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, Inject, SimpleChanges, OnChanges } from '@angular/core';
 import { NgFor, CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -24,7 +24,7 @@ import { Notice } from '../Notice';
   ],
   standalone: true
 })
-export class LogItemDatesComponent implements OnInit {
+export class LogItemDatesComponent implements OnInit, OnChanges {
   @Input() id!: string;
   @ViewChild('paginator') paginator!: MatPaginator
   pageSizeOptions = [5, 10, 25, 50, 100];
@@ -46,6 +46,12 @@ export class LogItemDatesComponent implements OnInit {
   ngOnInit() {
     this.loadData(this.pageIndex, this.pageSize);
   }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.hasOwnProperty('id')) {
+      this.loadData(0, this.pageSize);
+    }
+  }
+
   showPagnator() {
     return (this.totalItems / this.pageSize) > 1;
   }

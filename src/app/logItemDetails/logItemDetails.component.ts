@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Component, OnInit, Input, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, Inject, OnChanges, SimpleChanges } from '@angular/core';
 import { NgFor, CommonModule } from '@angular/common';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -22,7 +22,7 @@ import { Notice } from '../Notice';
   ],
   standalone: true
 })
-export class LogItemDetailsComponent implements OnInit {
+export class LogItemDetailsComponent implements OnInit, OnChanges {
   @Input() id!: string;
   @Input() search!: string;
   @ViewChild('paginator') paginator!: MatPaginator
@@ -45,6 +45,11 @@ export class LogItemDetailsComponent implements OnInit {
   }
   ngOnInit() {
     this.loadData(this.pageIndex, this.pageSize);
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.hasOwnProperty('id')) {
+      this.loadData(0, this.pageSize);
+    }
   }
 
   loadData(pageIndex: number, pageSize: number) {
