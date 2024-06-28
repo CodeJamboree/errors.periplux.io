@@ -35,7 +35,9 @@
   <tbody>
     <tr *ngFor="let item of data" (click)="onRowClick(item)" class="{{selectedClass(item.id)}}">
       <td class="id number">{{item.id}}</td>
-      <td class="icon" title="{{item.scope}}"><img src="{{ generateMatrixImage(item.scope_hash)}}"></td>
+      <td class="icon" title="{{item.scope}}">
+        <div class="image-hash" [style.background-image]="generateMatrixLinearGradient(item.scope_hash)"></div>
+      </td>
       <td class="date" title="{{item.last_at * 1000 | date: 'fullDate'}}"
         attr.data-weekday="{{item.last_at * 1000 | date: 'c' }}">
         {{item.last_at * 1000 | date: 'shortDate'}}</td>

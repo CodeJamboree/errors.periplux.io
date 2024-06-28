@@ -20,6 +20,7 @@ import { LogItemComponentData } from '../logItem/LogItemComponentData';
 import { CredentialsComponent } from '../credentials/credentials.component';
 import { AuthService } from '../../AuthService';
 import { Notice } from '../Notice';
+import { generateMatrixLinearGradient } from './utils/generateMatrixLinearGradient';
 
 const defaultPageSize = 25;
 
@@ -56,6 +57,7 @@ export class LogListComponent implements OnInit {
   isDialogOpen: boolean = false;
   errorTypeAsEmoji = errorTypeAsEmoji;
   generateMatrixImage = generateMatrixImage;
+  generateMatrixLinearGradient = generateMatrixLinearGradient;
   notice: Notice;
   pendingLogWaiting: boolean = false;
   hasPendingLogs: boolean = false;

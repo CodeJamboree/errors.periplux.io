@@ -2,6 +2,12 @@
 @import url(../tables.scss);
 @import url(../search/highlight.scss);
 
+.image-hash {
+  width: 16px;
+  height: 16px;
+  border: 1px solid black;
+}
+
 .top-controls,
 .bottom-controls {
   display: flex;
@@ -24,7 +30,9 @@
 
 table {
   table-layout: fixed;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial,
+    Helvetica,
+    sans-serif;
   font-size: smaller;
   width: 100%;
 
