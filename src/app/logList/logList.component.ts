@@ -153,7 +153,8 @@ export class LogListComponent implements OnInit {
       .subscribe({
         next: response => {
           this.hasPendingLogs = response.has_more;
-          this.notice.success(`Logs Transferred: ${response.transferred}`);
+          let moreMessage = response.has_more ? 'There are more logs pending.' : 'No more logs pending.';
+          this.notice.success(`Logs Transferred: ${response.transferred}. ${moreMessage}`);
         }, error: (error: Error) => {
           this.notice.error(error.message);
           this.pendingLogWaiting = false;
