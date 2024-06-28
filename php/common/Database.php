@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . 'HTTP_STATUS.php';
-require_once __DIR__ . 'Secrets.php';
+require_once 'HTTP_STATUS.php';
+require_once 'Secrets.php';
 
 // mysqli_report(MYSQLI_REPORT_OFF);
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
