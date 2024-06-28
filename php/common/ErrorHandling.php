@@ -116,8 +116,12 @@ function continue_after_error_number($errno)
 }
 function custom_error_handler($errno, $errstr, $errfile, $errline)
 {
+    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    array_shift($trace);
+    $stack_trace = compile_stack($trace);
+
     $type = error_number_as_type($errno);
-    if (log_error($type, $errstr, $errfile, $errline)) {
+    if (log_error($type, $errstr, $errfile, $errline, $stack_trace)) {
         if (continue_after_error_number($errno)) {
             return true;
         }
@@ -139,7 +143,7 @@ function custom_exception_handler($exception)
         $message = "[$code] " . $message;
     }
 
-    $stack_trace = compile_stack($exception->getTrace());
+    $stack_trace = $exception->getTraceAsString();
 
     if (log_error($class, $message, $file, $line, $stack_trace)) {
         Show::error("An unexpected exception was reported. $message");
@@ -147,35 +151,32 @@ function custom_exception_handler($exception)
         Show::error($message);
     }
 }
-
+function get_key_value(string $key, array $array, string $default_value)
+{
+    if (array_key_exists($key, $array)) {
+        return $array[$key];
+    }
+    return $default_value;
+}
 function compile_stack($trace)
 {
+    if (is_string($trace)) {
+        return $trace;
+    }
+
     $stack = "";
     $count = count($trace);
     foreach ($trace as $index => $frame) {
-        $file = $frame['file'];
-        $line = $frame['line'];
-        if (array_key_exists('function', $frame)) {
-            $func = $frame['function'];
-        } else {
-            $func = '';
+        if (is_string($frame)) {
+            $stack .= $frame . "\n";
+            continue;
         }
-        if (array_key_exists('class', $frame)) {
-            $class = $frame['class'];
-        } else {
-            $class = '';
-        }
-        if (array_key_exists('type', $frame)) {
-            $type = $frame['type'];
-
-        } else {
-            $type = '';
-        }
-        if ($index === $count - 1) {
-            $stack .= "#$index {" . $class . $type . $func . "}\n  thrown in $file on line $line";
-        } else {
-            $stack .= "#$index $file($line): $class$type$func\n";
-        }
+        $file = get_key_value('file', $frame, '');
+        $line = get_key_value('line', $frame, '');
+        $func = get_key_value('function', $frame, '');
+        $class = get_key_value('class', $frame, '');
+        $type = get_key_value('type', $frame, '');
+        $stack .= "#$index $file($line): $class$type$func\n";
     }
     return $stack;
 }
