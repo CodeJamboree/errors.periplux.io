@@ -43,6 +43,14 @@ function log_error($type, $message, $path, $line, $stack_trace = null)
             return false;
         }
 
+        $db->affectAny(
+            "CALL sp_log_details(?, ?, ?)",
+            'iss',
+            $log_id,
+            'Url',
+            $_SERVER['REQUEST_URI']
+        );
+
         if ($stack_trace === null) {
             return true;
         }
