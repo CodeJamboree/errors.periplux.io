@@ -44,7 +44,9 @@
       <td class="time" title="{{item.last_at * 1000 | date: 'fullTime'}}">{{item.last_at * 1000 | date: 'shortTime'}}
       </td>
       <td class="type" title="{{item.type}}">{{errorTypeAsEmoji(item.type)}}</td>
-      <td class="icon"><img src="{{ generateMatrixImage(item.message_hash)}}"></td>
+      <td class="icon">
+        <div class="image-hash" [style.background-image]="generateMatrixLinearGradient(item.message_hash)"></div>
+      </td>
       <td class="message" title=" {{item.message}}">
         <div *ngIf="searchText">
           <span *ngFor="let part of searchParts(item.message)">
@@ -53,7 +55,9 @@
         </div>
         <div *ngIf="!searchText">{{item.message}}</div>
       </td>
-      <td class="icon"><img src="{{ generateMatrixImage(item.path_hash)}}"></td>
+      <td class="icon">
+        <div class="image-hash" [style.background-image]="generateMatrixLinearGradient(item.path_hash)"></div>
+      </td>
       <td class="path" title="{{item.path}}">
         <div *ngIf="searchText" attr.data-file="{{parseFile(item.path)}}">
           <span *ngFor="let part of searchParts(item.path)">
