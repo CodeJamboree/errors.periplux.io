@@ -10,7 +10,7 @@ function main()
     try {
         $posted = new PostedJson(2);
     } catch (Exception $e) {
-        Show::error($e->getMessage(), $exception->getCode());
+        Show::error($e->getMessage(), $e->getCode());
         exit;
     }
 
