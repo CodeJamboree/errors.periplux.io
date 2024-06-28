@@ -65,7 +65,7 @@ export class LogListService {
     ));
   }
   transferLogs() {
-    return this.api.get<TransferLogs | MessageResponse>('view', { size: 1 }).pipe(map(
+    return this.api.get<TransferLogs | MessageResponse>('transfer', {}).pipe(map(
       data => {
         if ('message' in data) throw new Error(data.message);
         return data;
