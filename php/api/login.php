@@ -7,7 +7,12 @@ require_once "../common/rate_limiting.php";
 
 function main()
 {
-    $posted = new PostedJson(2);
+    try {
+        $posted = new PostedJson(2);
+    } catch (Exception $e) {
+        Show::error($e->getMessage(), $exception->getCode());
+        exit;
+    }
 
     if (!$posted->keysExist('username', 'password')) {
         Show::error($posted->lastError(), $posted->lastErrorCode());
