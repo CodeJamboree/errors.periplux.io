@@ -18,7 +18,6 @@ import { errorTypeAsEmoji } from './utils/errorTypeAsEmoji';
 import { highlightSearchTerms } from '../search/highlightSearchTerms';
 import { LogItemComponentData } from '../logItem/LogItemComponentData';
 import { CredentialsComponent } from '../credentials/credentials.component';
-import { CredentialsData } from '../credentials/CredentialsData';
 import { AuthService } from '../../AuthService';
 import { Notice } from '../Notice';
 
@@ -60,6 +59,7 @@ export class LogListComponent implements OnInit {
   notice: Notice;
   pendingLogWaiting: boolean = false;
   hasPendingLogs: boolean = false;
+  forceLoad: boolean = false;
 
   constructor(
     private logListService: LogListService,
@@ -105,15 +105,21 @@ export class LogListComponent implements OnInit {
     })
   }
   search() {
+    this.forceLoad = true;
     this.loadData(0, this.pageSize, this.searchInput);
   }
   searchParts(text: string) {
     return highlightSearchTerms(text, this.searchText);
   }
+  refresh() {
+    this.forceLoad = true;
+    this.loadData(this.pageIndex, this.pageSize, this.searchInput);
+  }
   loadData(pageIndex: number, pageSize: number, search: string) {
-    if (pageIndex === this.pageIndex && pageSize === this.pageSize && search === this.searchText) {
+    if (!this.forceLoad && pageIndex === this.pageIndex && pageSize === this.pageSize && search === this.searchText) {
       return;
     }
+    this.forceLoad = false;
     this.searchWaiting = true;
     this.logListService.getPage(pageIndex + 1, pageSize, search)
       .subscribe({
@@ -160,6 +166,7 @@ export class LogListComponent implements OnInit {
           this.pendingLogWaiting = false;
         }, complete: () => {
           this.pendingLogWaiting = false;
+          this.refresh();
         }
       });
   }
