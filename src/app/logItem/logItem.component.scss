@@ -2,6 +2,12 @@
 @import url(../tables.scss);
 @import url(../search/highlight.scss);
 
+.image-hash {
+  width: 16px;
+  height: 16px;
+  border: 1px solid silver;
+}
+
 table {
   table-layout: fixed;
 

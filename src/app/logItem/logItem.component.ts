@@ -17,12 +17,12 @@ import { CommonModule } from '@angular/common';
 import { LogData } from '../logList/LogData';
 import { LogItemDatesComponent } from '../logItemDates/logItemDates.component';
 import { LogItemDetailsComponent } from '../logItemDetails/logItemDetails.component';
-import { generateMatrixImage } from '../logList/utils/generateMatrixImage';
 import { errorTypeAsEmoji } from '../logList/utils/errorTypeAsEmoji';
 import { errorNumberAsType } from '../logList/utils/errorNumberAsType';
 import { DurationPipe } from '../pipes/DurationPipe';
 import { AgePipe } from '../pipes/AgePipe';
 import { highlightSearchTerms } from '../search/highlightSearchTerms';
+import { generateMatrixLinearGradient } from '../logList/utils/generateMatrixLinearGradient';
 
 interface NextLogEvent {
   id: number,
@@ -54,7 +54,7 @@ export class LogItemComponent implements OnInit, OnDestroy {
   priorItemEvent = new EventEmitter<NextLogEvent>();
 
   errorTypeAsEmoji = errorTypeAsEmoji;
-  generateMatrixImage = generateMatrixImage;
+  generateMatrixLinearGradient = generateMatrixLinearGradient;
   errorNumberAsType = errorNumberAsType;
   boundKeydown: (event: KeyboardEvent) => void;
 

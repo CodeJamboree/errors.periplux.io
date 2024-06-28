@@ -13,7 +13,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { LogListService } from './logList.service';
 import { LogItemComponent } from '../logItem/logItem.component';
 import { LogData } from './LogData';
-import { generateMatrixImage } from './utils/generateMatrixImage';
 import { errorTypeAsEmoji } from './utils/errorTypeAsEmoji';
 import { highlightSearchTerms } from '../search/highlightSearchTerms';
 import { LogItemComponentData } from '../logItem/LogItemComponentData';
@@ -56,7 +55,6 @@ export class LogListComponent implements OnInit {
   loadSelectedWaiting: boolean = false;
   isDialogOpen: boolean = false;
   errorTypeAsEmoji = errorTypeAsEmoji;
-  generateMatrixImage = generateMatrixImage;
   generateMatrixLinearGradient = generateMatrixLinearGradient;
   notice: Notice;
   pendingLogWaiting: boolean = false;

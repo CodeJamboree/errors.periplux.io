@@ -16,7 +16,7 @@
       <tr>
         <td>Scope</td>
         <td>
-          <img src="{{generateMatrixImage(item.scope_hash)}}">
+          <div class="image-hash" [style.background-image]="generateMatrixLinearGradient(item.scope_hash)"></div>
           <span *ngIf="searchText">
             <span *ngFor="let part of searchParts(item.scope)">
               <span class="{{part.className}}">{{part.text}}</span>
@@ -66,7 +66,7 @@
       <tr>
         <td>Message</td>
         <td class="scroll">
-          <img src="{{generateMatrixImage(item.message_hash)}}">
+          <div class="image-hash" [style.background-image]="generateMatrixLinearGradient(item.message_hash)"></div>
           <span *ngIf="searchText">
 
             <span *ngFor="let part of searchParts(item.message)">
@@ -79,7 +79,7 @@
       <tr>
         <td>Path</td>
         <td class="scroll">
-          <img src="{{generateMatrixImage(item.path_hash)}}">
+          <div class="image-hash" [style.background-image]="generateMatrixLinearGradient(item.path_hash)"></div>
           <span *ngIf="searchText">
             <span *ngFor="let part of searchParts(item.path)">
               <span class="{{part.className}}">{{part.text}}</span>
