@@ -132,7 +132,7 @@ function custom_exception_handler($exception)
         $message = "[$code] " . $message;
     }
 
-    $stack_trace = compile_stack(debug_backtrace());
+    $stack_trace = compile_stack($exception->getTrace());
 
     if (log_error($class, $message, $file, $line, $stack_trace)) {
         Show::error("An unexpected exception was reported. $message");
@@ -143,13 +143,32 @@ function custom_exception_handler($exception)
 
 function compile_stack($trace)
 {
-    array_shift($trace);
     $stack = "";
-    foreach ($trace as $frame) {
+    $count = count($trace);
+    foreach ($trace as $index => $frame) {
         $file = $frame['file'];
         $line = $frame['line'];
-        $func = $frame['function'];
-        $stack .= "File: $file, Line: $line, function: $function\n";
+        if (array_key_exists('function', $frame)) {
+            $func = $frame['function'];
+        } else {
+            $func = '';
+        }
+        if (array_key_exists('class', $frame)) {
+            $class = $frame['class'];
+        } else {
+            $class = '';
+        }
+        if (array_key_exists('type', $frame)) {
+            $type = $frame['type'];
+
+        } else {
+            $type = '';
+        }
+        if ($index === $count - 1) {
+            $stack .= "#$index {" . $class . $type . $func . "}\n  thrown in $file on line $line";
+        } else {
+            $stack .= "#$index $file($line): $class$type$func\n";
+        }
     }
     return $stack;
 }
