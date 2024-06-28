@@ -16,7 +16,14 @@ function ignore_error($message)
     }
     return false;
 }
-function log_error($type, $message, $path, $line, $stack_trace = null)
+function full_url()
+{
+    $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != "off") || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+    $host = $_SERVER['HTTP_HOST'];
+    $uri = $_SERVER['REQUEST_URI'];
+    return $protocol . $host . $uri;
+}
+function log_error($type, $message, $path, $line, ?string $stack_trace = null)
 {
     if (ignore_error($message)) {
         return true;
@@ -48,7 +55,7 @@ function log_error($type, $message, $path, $line, $stack_trace = null)
             'iss',
             $log_id,
             'Url',
-            $_SERVER['REQUEST_URI']
+            full_url()
         );
 
         if ($stack_trace === null) {
