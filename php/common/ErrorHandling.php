@@ -129,6 +129,7 @@ function custom_error_handler($errno, $errstr, $errfile, $errline)
     } else {
         Show::error($errstr);
     }
+    exit;
 }
 
 function custom_exception_handler($exception)
@@ -150,6 +151,7 @@ function custom_exception_handler($exception)
     } else {
         Show::error($message);
     }
+    exit;
 }
 function get_key_value(string $key, array $array, string $default_value)
 {
