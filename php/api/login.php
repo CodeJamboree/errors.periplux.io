@@ -37,6 +37,21 @@ function main()
     \error_log\rate_limiting\guard_locked_accounts();
 
     $credentials = Secrets::revealArray("CREDENTIALS");
+    if ($credentials === false) {
+        // new user account
+        $salt = openssl_random_pseudo_bytes(16);
+        $salt_hex = bin2hex($salt);
+
+        $hash = hash('sha256', $password . $salt_hex);
+        $hash_hex = bin2hex($hash);
+
+        $credentials = [
+            'username' => $username,
+            'password_salt' => $salt_hex,
+            'password_hash' => $hash_hex,
+        ];
+        Secrets::keepArray("CREDENTIALS", $credentials);
+    }
 
     $password_salt = $credentials['password_salt'];
     $hash = hash('sha256', $password . $password_salt);
